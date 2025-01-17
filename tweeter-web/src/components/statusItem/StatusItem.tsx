@@ -11,6 +11,8 @@ interface Props {
 }
 
 const StatusItem = (props: Props) => {
+  console.log("Using StatusItem Component");
+
   const { displayErrorMessage } = useToastListener();
 
   const { displayedUser, setDisplayedUser, currentUser, authToken } =
