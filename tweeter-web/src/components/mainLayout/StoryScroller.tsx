@@ -3,8 +3,6 @@ import { UserInfoContext } from "../userInfo/UserInfoProvider";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Link } from "react-router-dom";
-import Post from "../statusItem/Post";
 import useToastListener from "../toaster/ToastListenerHook";
 import StatusItem from "../statusItem/StatusItem";
 
@@ -21,7 +19,7 @@ const StoryScroller = () => {
   const addItems = (newItems: Status[]) =>
     setNewItems(newItems);
 
-  const { displayedUser, setDisplayedUser, currentUser, authToken } =
+  const { displayedUser, authToken } =
     useContext(UserInfoContext);
 
   // Initialize the component whenever the displayed user changes
@@ -80,38 +78,6 @@ const StoryScroller = () => {
     // TODO: Replace with the result of calling server
     return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
   };
-  const navigateToUser = async (event: React.MouseEvent): Promise<void> => {
-    event.preventDefault();
-
-    try {
-      const alias = extractAlias(event.target.toString());
-
-      const user = await getUser(authToken!, alias);
-
-      if (!!user) {
-        if (currentUser!.equals(user)) {
-          setDisplayedUser(currentUser!);
-        } else {
-          setDisplayedUser(user);
-        }
-      }
-    } catch (error) {
-      displayErrorMessage(`Failed to get user because of exception: ${error}`);
-    }
-  };
-
-  const extractAlias = (value: string): string => {
-    const index = value.indexOf("@");
-    return value.substring(index);
-  };
-
-  const getUser = async (
-    authToken: AuthToken,
-    alias: string
-  ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
-  };
 
   return (
     <div className="container px-0 overflow-visible vh-100">
@@ -128,6 +94,7 @@ const StoryScroller = () => {
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
             <StatusItem status={item} user={item.user} />
+
           </div>
         ))}
       </InfiniteScroll>
