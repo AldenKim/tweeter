@@ -15,7 +15,7 @@ const StatusItem = (props: Props) => {
 
   const { displayErrorMessage } = useToastListener();
 
-  const { displayedUser, setDisplayedUser, currentUser, authToken } =
+  const { setDisplayedUser, currentUser, authToken } =
     useContext(UserInfoContext);
 
   const navigateToUser = async (event: React.MouseEvent): Promise<void> => {
