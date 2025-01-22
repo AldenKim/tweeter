@@ -26,12 +26,6 @@ const Login = (props: Props) => {
     return !alias || !password;
   };
 
-  const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      doLogin();
-    }
-  };
-
   const doLogin = async () => {
     try {
       setIsLoading(true);
