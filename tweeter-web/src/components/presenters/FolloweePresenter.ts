@@ -1,15 +1,15 @@
 import { FollowService } from "../model/service/FollowService";
+import { UserItemPresenter, UserItemView } from "./UserItemPresenter";
 
 export interface FolloweeView {
 
 }
 
-export class FolloweePresenter {
+export class FolloweePresenter extends UserItemPresenter {
     private followService: FollowService;
-    private view: FolloweeView;
 
-    public constructor(view: FolloweeView) {
+    public constructor(view: UserItemView) {
+        super(view)
         this.followService = new FollowService();
-        this.view=view;
     }
 }
