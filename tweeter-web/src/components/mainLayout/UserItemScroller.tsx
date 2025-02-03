@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import UserItem from "../userItem/UserItem";
 import useToastListener from "../toaster/ToastListenerHook";
 import userInfoHook from "../userInfo/UserInfoHook";
+import { FolloweePresenter, FolloweeView } from "../presenters/FolloweePresenter";
 
 export const PAGE_SIZE = 10;
 
@@ -15,6 +16,7 @@ interface Props {
     lastItem: User | null
   ) => Promise<[User[], boolean]>;
   itemDescription: string;
+  presenterGenerator: (view: FolloweeView) => FolloweePresenter;
 }
 
 const UserItemScroller = (props: Props) => {
@@ -56,6 +58,12 @@ const UserItemScroller = (props: Props) => {
     setHasMoreItems(true);
     setChangedDisplayedUser(true);
   }
+
+  const listener: FolloweeView = {
+    
+  }
+
+  const presenters = props.presenterGenerator(listener);
 
   const loadMoreItems = async () => {
     try {
