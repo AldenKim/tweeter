@@ -17,6 +17,9 @@ import userInfoHook from "./components/userInfo/UserInfoHook";
 import { FolloweePresenter } from "./components/presenters/FolloweePresenter";
 import { UserItemView } from "./components/presenters/UserItemPresenter";
 import { FollowerPresenter } from "./components/presenters/FollowerPresenter";
+import { StatusItemView } from "./components/presenters/StatusItemPresenter";
+import { StoryPresenter } from "./components/presenters/StoryPresenter";
+import { FeedPresenter } from "./components/presenters/FeedPresenter";
 
 const App = () => {
   const { currentUser, authToken } = userInfoHook();
@@ -40,26 +43,6 @@ const App = () => {
 };
 
 const AuthenticatedRoutes = () => {
-  const loadMoreFeedItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
-  const loadMoreStoryItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -69,8 +52,9 @@ const AuthenticatedRoutes = () => {
           element={
             <StatusItemScroller
               key={1}
-              itemDescription="feed"
-              loadMore={loadMoreFeedItems}
+              presenterGenerator={(view: StatusItemView) =>
+                new FeedPresenter(view)
+              }
             />
           }
         />
@@ -79,8 +63,9 @@ const AuthenticatedRoutes = () => {
           element={
             <StatusItemScroller
               key={2}
-              itemDescription="story"
-              loadMore={loadMoreStoryItems}
+              presenterGenerator={(view: StatusItemView) =>
+                new StoryPresenter(view)
+              }
             />
           }
         />
