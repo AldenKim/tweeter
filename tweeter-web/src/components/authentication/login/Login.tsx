@@ -7,6 +7,7 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
 import userInfoHook from "../../userInfo/UserInfoHook";
+import { LoginPresenter, LoginView } from "../../presenters/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -26,7 +27,7 @@ const Login = (props: Props) => {
     return !alias || !password;
   };
 
-  const doLogin = async () => {
+  /*const doLogin = async () => {
     try {
       setIsLoading(true);
 
@@ -60,14 +61,23 @@ const Login = (props: Props) => {
     }
 
     return [user, FakeData.instance.authToken];
+  };*/
+
+  const listener: LoginView = {
+    setIsLoading: setIsLoading,
+    updateUserInfo: updateUserInfo,
+    navigate: navigate,
+    displayErrorMessage: displayErrorMessage,
   };
+
+  const presenter = new LoginPresenter(listener);
 
   const inputFieldGenerator = () => {
     return (
       <>
         <AuthenticationFields alias = {alias} password= {password} 
         setAlias={ setAlias } setPassword={setPassword} 
-        doAuth={ doLogin } checkSubmitButtonStatus={checkSubmitButtonStatus}/>
+        doAuth={ () => presenter.doLogin(alias, password, rememberMe, props.originalUrl)} checkSubmitButtonStatus={checkSubmitButtonStatus}/>
       </>
     );
   };
@@ -90,7 +100,7 @@ const Login = (props: Props) => {
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
-      submit={doLogin}
+      submit={()=>presenter.doLogin(alias, password, rememberMe, props.originalUrl)}
     />
   );
 };
