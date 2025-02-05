@@ -6,7 +6,7 @@ export class UserService {
     await new Promise((res) => setTimeout(res, 1000));
   }
 
-  public async login (
+  public async login(
     alias: string,
     password: string
   ): Promise<[User, AuthToken]> {
@@ -18,5 +18,5 @@ export class UserService {
     }
 
     return [user, FakeData.instance.authToken];
-  };
+  }
 }

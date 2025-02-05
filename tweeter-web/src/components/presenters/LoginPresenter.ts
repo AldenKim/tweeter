@@ -1,23 +1,34 @@
 import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
+import { NavigateOptions, To } from "react-router-dom";
 
 export interface LoginView {
-    setIsLoading: (isLoading: boolean) => void;
-    updateUserInfo: (currentUser: User, displayedUser: User | null, authToken: AuthToken, remember: boolean) => void
-    navigate: (path: string) => void;
-    displayErrorMessage: (message: string, bootstrapClasses?: string) => void
+  setIsLoading: (isLoading: boolean) => void;
+  updateUserInfo: (
+    currentUser: User,
+    displayedUser: User | null,
+    authToken: AuthToken,
+    remember: boolean
+  ) => void;
+  navigate: (to: To, options?: NavigateOptions) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
 export class LoginPresenter {
-    private view: LoginView;
-    private service: UserService;
+  private view: LoginView;
+  private service: UserService;
 
-    public constructor(view: LoginView) {
-        this.view = view;
-        this.service = new UserService();
-    }
+  public constructor(view: LoginView) {
+    this.view = view;
+    this.service = new UserService();
+  }
 
-  public async doLogin(alias: string, password: string, rememberMe: boolean, originalUrl?: string){
+  public async doLogin(
+    alias: string,
+    password: string,
+    rememberMe: boolean,
+    originalUrl?: string
+  ) {
     try {
       this.view.setIsLoading(true);
 
@@ -37,5 +48,5 @@ export class LoginPresenter {
     } finally {
       this.view.setIsLoading(false);
     }
-  };
+  }
 }

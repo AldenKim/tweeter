@@ -27,42 +27,6 @@ const Login = (props: Props) => {
     return !alias || !password;
   };
 
-  /*const doLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate("/");
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (
-    alias: string,
-    password: string
-  ): Promise<[User, AuthToken]> => {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };*/
-
   const listener: LoginView = {
     setIsLoading: setIsLoading,
     updateUserInfo: updateUserInfo,
@@ -75,9 +39,16 @@ const Login = (props: Props) => {
   const inputFieldGenerator = () => {
     return (
       <>
-        <AuthenticationFields alias = {alias} password= {password} 
-        setAlias={ setAlias } setPassword={setPassword} 
-        doAuth={ () => presenter.doLogin(alias, password, rememberMe, props.originalUrl)} checkSubmitButtonStatus={checkSubmitButtonStatus}/>
+        <AuthenticationFields
+          alias={alias}
+          password={password}
+          setAlias={setAlias}
+          setPassword={setPassword}
+          doAuth={() =>
+            presenter.doLogin(alias, password, rememberMe, props.originalUrl)
+          }
+          checkSubmitButtonStatus={checkSubmitButtonStatus}
+        />
       </>
     );
   };
@@ -100,7 +71,9 @@ const Login = (props: Props) => {
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
-      submit={()=>presenter.doLogin(alias, password, rememberMe, props.originalUrl)}
+      submit={() =>
+        presenter.doLogin(alias, password, rememberMe, props.originalUrl)
+      }
     />
   );
 };
