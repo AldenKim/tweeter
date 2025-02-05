@@ -1,25 +1,11 @@
-import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model/service/UserService";
-import { NavigateOptions, To } from "react-router-dom";
+import { AuthenticationPresenter, AuthenticationView } from "./AuthenticationPresenter";
 
-export interface LoginView {
-  setIsLoading: (isLoading: boolean) => void;
-  updateUserInfo: (
-    currentUser: User,
-    displayedUser: User | null,
-    authToken: AuthToken,
-    remember: boolean
-  ) => void;
-  navigate: (to: To, options?: NavigateOptions) => void;
-  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
-}
-
-export class LoginPresenter {
-  private view: LoginView;
+export class LoginPresenter extends AuthenticationPresenter{
   private service: UserService;
 
-  public constructor(view: LoginView) {
-    this.view = view;
+  public constructor(view: AuthenticationView) {
+    super(view);
     this.service = new UserService();
   }
 
@@ -30,7 +16,7 @@ export class LoginPresenter {
     originalUrl?: string
   ) {
     try {
-      this.view.setIsLoading(true);
+      this.isLoading = true;
 
       const [user, authToken] = await this.service.login(alias, password);
 
@@ -46,7 +32,7 @@ export class LoginPresenter {
         `Failed to log user in because of exception: ${error}`
       );
     } finally {
-      this.view.setIsLoading(false);
+      this.isLoading = (false);
     }
   }
 }

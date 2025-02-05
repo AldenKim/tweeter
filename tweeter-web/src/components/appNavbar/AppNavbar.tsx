@@ -2,13 +2,13 @@ import "./AppNavbar.css";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
 import Image from "react-bootstrap/Image";
-import { AuthToken } from "tweeter-shared";
 import useToastListener from "../toaster/ToastListenerHook";
 import userInfoHook from "../userInfo/UserInfoHook";
 import {
   AppNavbarPresenter,
   AppNavbarView,
 } from "../presenters/AppNavbarPresenter";
+import { useState } from "react";
 
 const AppNavbar = () => {
   const location = useLocation();
@@ -23,7 +23,7 @@ const AppNavbar = () => {
     clearUserInfo: clearUserInfo,
   };
 
-  const presenter = new AppNavbarPresenter(listener);
+  const [presenter] = useState(new AppNavbarPresenter(listener));
 
   return (
     <Navbar
@@ -64,7 +64,7 @@ const AppNavbar = () => {
               <NavLink to="/followers">Followers</NavLink>
             </Nav.Item>
             <Nav.Item>
-              <NavLink id="logout" onClick={() => presenter.logOut(authToken!)} to={location.pathname}>
+              <NavLink id="logout" onClick={ () => presenter.logOut(authToken!)} to={location.pathname}>
                 Logout
               </NavLink>
             </Nav.Item>
