@@ -8,6 +8,8 @@ import { Buffer } from "buffer";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
 import userInfoHook from "../../userInfo/UserInfoHook";
+import { AuthenticationView } from "../../presenters/AuthenticationPresenter";
+import { RegisterPresenter } from "../../presenters/RegisterPresenter";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -18,7 +20,6 @@ const Register = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageFileExtension, setImageFileExtension] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { updateUserInfo } = userInfoHook();
@@ -37,7 +38,15 @@ const Register = () => {
 
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      doRegister();
+      presenter.doRegister(
+        firstName,
+        lastName,
+        alias,
+        password,
+        imageBytes,
+        imageFileExtension,
+        rememberMe
+      );
     }
   };
 
@@ -82,51 +91,13 @@ const Register = () => {
     return file.name.split(".").pop();
   };
 
-  const doRegister = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      updateUserInfo(user, user, authToken, rememberMe);
-      navigate("/");
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const listener: AuthenticationView = {
+    updateUserInfo: updateUserInfo,
+    navigate: navigate,
+    displayErrorMessage: displayErrorMessage,
   };
 
-  const register = async (
-    firstName: string,
-    lastName: string,
-    alias: string,
-    password: string,
-    userImageBytes: Uint8Array,
-    imageFileExtension: string
-  ): Promise<[User, AuthToken]> => {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };
+  const [presenter] = useState(new RegisterPresenter(listener));
 
   const inputFieldGenerator = () => {
     return (
@@ -155,9 +126,24 @@ const Register = () => {
           />
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
-        <AuthenticationFields alias={alias} password={password} 
-        setAlias={setAlias} setPassword={setPassword} 
-        doAuth={doRegister} checkSubmitButtonStatus={checkSubmitButtonStatus} />
+        <AuthenticationFields
+          alias={alias}
+          password={password}
+          setAlias={setAlias}
+          setPassword={setPassword}
+          doAuth={() =>
+            presenter.doRegister(
+              firstName,
+              lastName,
+              alias,
+              password,
+              imageBytes,
+              imageFileExtension,
+              rememberMe
+            )
+          }
+          checkSubmitButtonStatus={checkSubmitButtonStatus}
+        />
         <div className="form-floating mb-3">
           <input
             type="file"
@@ -190,8 +176,18 @@ const Register = () => {
       switchAuthenticationMethodGenerator={switchAuthenticationMethodGenerator}
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={isLoading}
-      submit={doRegister}
+      isLoading={presenter.isLoading}
+      submit={() =>
+        presenter.doRegister(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension,
+          rememberMe
+        )
+      }
     />
   );
 };
