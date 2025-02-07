@@ -16,8 +16,7 @@ export class LoginPresenter extends AuthenticationPresenter{
     originalUrl?: string
   ) {
     try {
-      this.isLoading = true;
-
+      this.view.setIsLoading(true);
       const [user, authToken] = await this.service.login(alias, password);
 
       this.view.updateUserInfo(user, user, authToken, rememberMe);
@@ -32,7 +31,7 @@ export class LoginPresenter extends AuthenticationPresenter{
         `Failed to log user in because of exception: ${error}`
       );
     } finally {
-      this.isLoading = (false);
+      this.view.setIsLoading(false);
     }
   }
 }

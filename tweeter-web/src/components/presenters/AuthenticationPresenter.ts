@@ -2,6 +2,7 @@ import { To, NavigateOptions } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
 
 export interface AuthenticationView {
+  setIsLoading: (isLoading: boolean) => void;
   updateUserInfo: (
     currentUser: User,
     displayedUser: User | null,
@@ -13,8 +14,6 @@ export interface AuthenticationView {
 }
 
 export abstract class AuthenticationPresenter {
-  private _isLoading = false;
-    
   private _view: AuthenticationView;
 
   constructor(view: AuthenticationView) {
@@ -23,13 +22,5 @@ export abstract class AuthenticationPresenter {
 
   protected get view() {
     return this._view;
-  }
-
-  public get isLoading() {
-    return this._isLoading;
-  }
-
-  protected set isLoading(value: boolean) {
-    this._isLoading = value;
   }
 }

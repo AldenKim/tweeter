@@ -20,6 +20,7 @@ const Register = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageFileExtension, setImageFileExtension] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { updateUserInfo } = userInfoHook();
@@ -92,6 +93,7 @@ const Register = () => {
   };
 
   const listener: AuthenticationView = {
+    setIsLoading: setIsLoading,
     updateUserInfo: updateUserInfo,
     navigate: navigate,
     displayErrorMessage: displayErrorMessage,
@@ -176,7 +178,7 @@ const Register = () => {
       switchAuthenticationMethodGenerator={switchAuthenticationMethodGenerator}
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={presenter.isLoading}
+      isLoading={isLoading}
       submit={() =>
         presenter.doRegister(
           firstName,
