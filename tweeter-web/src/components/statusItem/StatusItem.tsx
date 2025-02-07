@@ -9,8 +9,6 @@ interface Props {
 }
 
 const StatusItem = (props: Props) => {
-  console.log("Using StatusItem Component");
-
   const { navigate } = userNavigationHook();
 
   return (
