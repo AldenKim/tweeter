@@ -1,8 +1,8 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { AuthToken, Status } from "tweeter-shared";
 import useToastListener from "../toaster/ToastListenerHook";
 import userInfoHook from "../userInfo/UserInfoHook";
+import { PostStatusPresenter, PostStatusView } from "../presenters/PostStatusPresenter";
 
 const PostStatus = () => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
@@ -15,35 +15,18 @@ const PostStatus = () => {
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
 
-    try {
-      setIsLoading(true);
-      displayInfoMessage("Posting status...", 0);
-
-      const status = new Status(post, currentUser!, Date.now());
-
-      await postStatus(authToken!, status);
-
-      setPost("");
-      displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    } finally {
-      clearLastInfoMessage();
-      setIsLoading(false);
-    }
+    presenter.submitPost(post, currentUser, authToken)
   };
 
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
+  const listener: PostStatusView = {
+    setIsLoading: setIsLoading,
+    displayErrorMessage: displayErrorMessage,
+    displayInfoMessage: displayInfoMessage,
+    setPost: setPost,
+    clearLastInfoMessage: clearLastInfoMessage,
   };
+      
+  const [presenter] = useState(new PostStatusPresenter(listener));
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();
