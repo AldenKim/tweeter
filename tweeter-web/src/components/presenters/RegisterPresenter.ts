@@ -1,7 +1,10 @@
 import { UserService } from "../model/service/UserService";
-import { AuthenticationPresenter, AuthenticationView } from "./AuthenticationPresenter";
+import {
+  AuthenticationPresenter,
+  AuthenticationView,
+} from "./AuthenticationPresenter";
 
-export class RegisterPresenter extends AuthenticationPresenter{
+export class RegisterPresenter extends AuthenticationPresenter {
   private service: UserService;
 
   public constructor(view: AuthenticationView) {
@@ -9,11 +12,17 @@ export class RegisterPresenter extends AuthenticationPresenter{
     this.service = new UserService();
   }
 
- public async doRegister(firstName: string, lastName:string, 
-    alias: string, password: string, imageBytes: 
-    Uint8Array, imageFileExtension: string, rememberMe: boolean) {
+  public async doRegister(
+    firstName: string,
+    lastName: string,
+    alias: string,
+    password: string,
+    imageBytes: Uint8Array,
+    imageFileExtension: string,
+    rememberMe: boolean
+  ) {
     try {
-      this.isLoading = true;
+      this.view.setIsLoading(true);
 
       const [user, authToken] = await this.service.register(
         firstName,
@@ -31,7 +40,7 @@ export class RegisterPresenter extends AuthenticationPresenter{
         `Failed to register user because of exception: ${error}`
       );
     } finally {
-      this.isLoading = false;
+      this.view.setIsLoading(false);
     }
-  };
+  }
 }
