@@ -18,9 +18,9 @@ const AppNavbar = () => {
 
   const listener: AppNavbarView = {
     displayInfoMessage: displayInfoMessage,
-    displayErrorMessage: displayErrorMessage,
     clearLastInfoMessage: clearLastInfoMessage,
     clearUserInfo: clearUserInfo,
+    displayErrorMessage: displayErrorMessage,
   };
 
   const [presenter] = useState(new AppNavbarPresenter(listener));
