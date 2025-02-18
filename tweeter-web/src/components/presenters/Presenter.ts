@@ -2,7 +2,7 @@ export interface View {
   displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
-export interface MessageView {
+export interface MessageView extends View{
   displayInfoMessage(
     message: string,
     duration: number,
