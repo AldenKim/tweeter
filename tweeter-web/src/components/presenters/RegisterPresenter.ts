@@ -12,6 +12,10 @@ export class RegisterPresenter extends AuthenticationPresenter {
     this.service = new UserService();
   }
 
+  protected get view(): AuthenticationView {
+    return super.view as AuthenticationView;
+  }
+
   public async doRegister(
     firstName: string,
     lastName: string,

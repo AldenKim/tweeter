@@ -9,6 +9,10 @@ export class LoginPresenter extends AuthenticationPresenter{
     this.service = new UserService();
   }
 
+  protected get view(): AuthenticationView {
+      return super.view as AuthenticationView;
+  }
+
   public async doLogin(
     alias: string,
     password: string,
