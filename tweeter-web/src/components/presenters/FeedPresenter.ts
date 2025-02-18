@@ -12,6 +12,10 @@ export class FeedPresenter extends StatusItemPresenter {
     this.statusService = new StatusService();
   }
 
+  protected get view(): StatusItemView {
+    return super.view as StatusItemView;
+  }
+
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     try {
       const [newItems, hasMore] = await this.statusService.loadMoreFeedItems(

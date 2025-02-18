@@ -1,7 +1,8 @@
 import { To, NavigateOptions } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
+import { Presenter, View } from "./Presenter";
 
-export interface AuthenticationView {
+export interface AuthenticationView extends View {
   setIsLoading: (isLoading: boolean) => void;
   updateUserInfo: (
     currentUser: User,
@@ -10,17 +11,10 @@ export interface AuthenticationView {
     remember: boolean
   ) => void;
   navigate: (to: To, options?: NavigateOptions) => void;
-  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
-export abstract class AuthenticationPresenter {
-  private _view: AuthenticationView;
-
+export abstract class AuthenticationPresenter extends Presenter {
   constructor(view: AuthenticationView) {
-    this._view = view;
-  }
-
-  protected get view() {
-    return this._view;
+    super(view);
   }
 }

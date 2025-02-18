@@ -12,6 +12,10 @@ export class FollowerPresenter extends UserItemPresenter {
     this.followService = new FollowService();
   }
 
+  protected get view(): UserItemView {
+    return super.view as UserItemView;
+  }
+
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     try {
       const [newItems, hasMore] = await this.followService.loadMoreFollowers(
