@@ -1,7 +1,10 @@
 import { UserService } from "../model/service/UserService";
-import { AuthenticationPresenter, AuthenticationView } from "./AuthenticationPresenter";
+import {
+  AuthenticationPresenter,
+  AuthenticationView,
+} from "./AuthenticationPresenter";
 
-export class LoginPresenter extends AuthenticationPresenter{
+export class LoginPresenter extends AuthenticationPresenter {
   private service: UserService;
 
   public constructor(view: AuthenticationView) {
@@ -10,7 +13,7 @@ export class LoginPresenter extends AuthenticationPresenter{
   }
 
   protected get view(): AuthenticationView {
-      return super.view as AuthenticationView;
+    return super.view as AuthenticationView;
   }
 
   public async doLogin(
@@ -19,7 +22,7 @@ export class LoginPresenter extends AuthenticationPresenter{
     rememberMe: boolean,
     originalUrl?: string
   ) {
-    try {
+    await this.doFailureReportingOperation(async () => {
       this.view.setIsLoading(true);
       const [user, authToken] = await this.service.login(alias, password);
 
@@ -30,12 +33,8 @@ export class LoginPresenter extends AuthenticationPresenter{
       } else {
         this.view.navigate("/");
       }
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    } finally {
-      this.view.setIsLoading(false);
-    }
+    }, "log user in");
+
+    this.view.setIsLoading(false);
   }
 }
