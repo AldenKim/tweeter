@@ -1,15 +1,9 @@
 import { AuthToken } from "tweeter-shared";
-import { StatusService } from "../model/service/StatusService";
-import { StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
-
-export const PAGE_SIZE = 10;
+import { PAGE_SIZE, StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
 
 export class FeedPresenter extends StatusItemPresenter {
-  private statusService: StatusService;
-
   public constructor(view: StatusItemView) {
     super(view);
-    this.statusService = new StatusService();
   }
 
   protected get view(): StatusItemView {
@@ -18,7 +12,7 @@ export class FeedPresenter extends StatusItemPresenter {
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     await this.doFailureReportingOperation(async () => {
-      const [newItems, hasMore] = await this.statusService.loadMoreFeedItems(
+      const [newItems, hasMore] = await this.service.loadMoreFeedItems(
         authToken!,
         userAlias,
         PAGE_SIZE,
