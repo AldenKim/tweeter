@@ -1,14 +1,4 @@
-import { User, AuthToken } from "tweeter-shared";
 import { AuthenticationPresenter } from "./AuthenticationPresenter";
-
-type RegisterParams = {
-  firstName: string;
-  lastName: string;
-  alias: string;
-  password: string;
-  imageBytes: Uint8Array;
-  imageFileExtension: string;
-};
 
 export class RegisterPresenter extends AuthenticationPresenter {
   public async doRegister(
