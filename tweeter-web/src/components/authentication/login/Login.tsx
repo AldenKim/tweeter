@@ -45,7 +45,7 @@ const Login = (props: Props) => {
           setAlias={setAlias}
           setPassword={setPassword}
           doAuth={() =>
-            presenter.doLogin(alias, password, rememberMe, props.originalUrl)
+            presenter.doAuthentication({alias, password}, rememberMe, props.originalUrl)
           }
           checkSubmitButtonStatus={checkSubmitButtonStatus}
         />
@@ -72,7 +72,7 @@ const Login = (props: Props) => {
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
       submit={() =>
-        presenter.doLogin(alias, password, rememberMe, props.originalUrl)
+        presenter.doAuthentication({alias, password}, rememberMe, props.originalUrl)
       }
     />
   );

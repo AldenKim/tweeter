@@ -39,13 +39,15 @@ const Register = () => {
 
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      presenter.doRegister(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension,
+      presenter.doAuthentication(
+        {
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension,
+        },
         rememberMe
       );
     }
@@ -134,13 +136,15 @@ const Register = () => {
           setAlias={setAlias}
           setPassword={setPassword}
           doAuth={() =>
-            presenter.doRegister(
-              firstName,
-              lastName,
-              alias,
-              password,
-              imageBytes,
-              imageFileExtension,
+            presenter.doAuthentication(
+              {
+                firstName,
+                lastName,
+                alias,
+                password,
+                imageBytes,
+                imageFileExtension,
+              },
               rememberMe
             )
           }
@@ -180,13 +184,15 @@ const Register = () => {
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
       submit={() =>
-        presenter.doRegister(
-          firstName,
-          lastName,
-          alias,
-          password,
-          imageBytes,
-          imageFileExtension,
+        presenter.doAuthentication(
+          {
+            firstName,
+            lastName,
+            alias,
+            password,
+            imageBytes,
+            imageFileExtension,
+          },
           rememberMe
         )
       }

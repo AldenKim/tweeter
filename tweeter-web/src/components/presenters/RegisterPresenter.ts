@@ -1,46 +1,34 @@
-import { UserService } from "../model/service/UserService";
+import { User, AuthToken } from "tweeter-shared";
 import {
   AuthenticationPresenter,
   AuthenticationView,
 } from "./AuthenticationPresenter";
 
-export class RegisterPresenter extends AuthenticationPresenter {
-  private service: UserService;
+type RegisterParams = {
+  firstName: string;
+  lastName: string;
+  alias: string;
+  password: string;
+  imageBytes: Uint8Array;
+  imageFileExtension: string;
+};
 
-  public constructor(view: AuthenticationView) {
-    super(view);
-    this.service = new UserService();
+export class RegisterPresenter extends AuthenticationPresenter<RegisterParams> {
+  protected authenticate(registerParams: RegisterParams): Promise<[User, AuthToken]> {
+    return this.service.register(
+      registerParams.firstName,
+      registerParams.lastName,
+      registerParams.alias,
+      registerParams.password,
+      registerParams.imageBytes,
+      registerParams.imageFileExtension
+    );
   }
-
-  protected get view(): AuthenticationView {
-    return super.view as AuthenticationView;
+  
+  protected navigate(originalUrl?: string): void {
+    this.view.navigate("/");
   }
-
-  public async doRegister(
-    firstName: string,
-    lastName: string,
-    alias: string,
-    password: string,
-    imageBytes: Uint8Array,
-    imageFileExtension: string,
-    rememberMe: boolean
-  ) {
-    await this.doFailureReportingOperation(async () => {
-      this.view.setIsLoading(true);
-
-      const [user, authToken] = await this.service.register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-      this.view.navigate("/");
-    }, "register user");
-
-    this.view.setIsLoading(false);
+  protected getItemDescription(): string {
+    return "register user"
   }
 }

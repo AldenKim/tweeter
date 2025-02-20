@@ -15,10 +15,6 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
     this.service = new StatusService();
   }
 
-  protected get view(): PostStatusView {
-    return super.view as PostStatusView;
-  }
-
   public async submitPost(
     post: string,
     currentUser: User | null,
