@@ -24,7 +24,7 @@ export class UserNavigationPresenter extends Presenter {
     authToken: AuthToken | null,
     currentUser: User | null
   ) {
-    try {
+    await this.doFailureReportingOperation(async () => {
       const alias = this.view.extractAlias(target);
 
       const user = await this.service.getUser(authToken!, alias);
@@ -36,10 +36,6 @@ export class UserNavigationPresenter extends Presenter {
           this.view.setDisplayedUser(user);
         }
       }
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to get user because of exception: ${error}`
-      );
-    }
+    }, "get user");
   }
 }
