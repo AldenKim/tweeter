@@ -1,8 +1,5 @@
 import { User, AuthToken } from "tweeter-shared";
-import {
-  AuthenticationPresenter,
-  AuthenticationView,
-} from "./AuthenticationPresenter";
+import { AuthenticationPresenter } from "./AuthenticationPresenter";
 
 type RegisterParams = {
   firstName: string;
@@ -13,22 +10,34 @@ type RegisterParams = {
   imageFileExtension: string;
 };
 
-export class RegisterPresenter extends AuthenticationPresenter<RegisterParams> {
-  protected authenticate(registerParams: RegisterParams): Promise<[User, AuthToken]> {
-    return this.service.register(
-      registerParams.firstName,
-      registerParams.lastName,
-      registerParams.alias,
-      registerParams.password,
-      registerParams.imageBytes,
-      registerParams.imageFileExtension
+export class RegisterPresenter extends AuthenticationPresenter {
+  public async doRegister(
+    firstName: string,
+    lastName: string,
+    alias: string,
+    password: string,
+    imageBytes: Uint8Array,
+    imageFileExtension: string,
+    rememberMe: boolean
+  ) {
+    await this.doAuthentication(
+      async () =>
+        this.service.register(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension
+        ),
+      rememberMe
     );
   }
-  
-  protected navigate(originalUrl?: string): void {
+
+  protected navigate(): void {
     this.view.navigate("/");
   }
   protected getItemDescription(): string {
-    return "register user"
+    return "register user";
   }
 }

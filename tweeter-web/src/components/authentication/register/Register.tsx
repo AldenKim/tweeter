@@ -3,7 +3,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import { Buffer } from "buffer";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthenticationFields from "../AuthenticationFields";
@@ -39,15 +38,13 @@ const Register = () => {
 
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      presenter.doAuthentication(
-        {
-          firstName,
-          lastName,
-          alias,
-          password,
-          imageBytes,
-          imageFileExtension,
-        },
+      presenter.doRegister(
+        firstName,
+        lastName,
+        alias,
+        password,
+        imageBytes,
+        imageFileExtension,
         rememberMe
       );
     }
@@ -136,15 +133,13 @@ const Register = () => {
           setAlias={setAlias}
           setPassword={setPassword}
           doAuth={() =>
-            presenter.doAuthentication(
-              {
-                firstName,
-                lastName,
-                alias,
-                password,
-                imageBytes,
-                imageFileExtension,
-              },
+            presenter.doRegister(
+              firstName,
+              lastName,
+              alias,
+              password,
+              imageBytes,
+              imageFileExtension,
               rememberMe
             )
           }
@@ -184,15 +179,13 @@ const Register = () => {
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
       submit={() =>
-        presenter.doAuthentication(
-          {
-            firstName,
-            lastName,
-            alias,
-            password,
-            imageBytes,
-            imageFileExtension,
-          },
+        presenter.doRegister(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension,
           rememberMe
         )
       }

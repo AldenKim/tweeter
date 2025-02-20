@@ -1,18 +1,17 @@
-import { User, AuthToken } from "tweeter-shared";
-import { UserService } from "../model/service/UserService";
-import {
-  AuthenticationPresenter,
-  AuthenticationView,
-} from "./AuthenticationPresenter";
+import { AuthenticationPresenter } from "./AuthenticationPresenter";
 
-type LoginParams = {
-  alias: string;
-  password: string;
-};
-
-export class LoginPresenter extends AuthenticationPresenter<LoginParams> {
-  protected authenticate(authParams: LoginParams): Promise<[User, AuthToken]> {
-    return this.service.login(authParams.alias, authParams.password);
+export class LoginPresenter extends AuthenticationPresenter {
+  public async doLogin(
+    alias: string,
+    password: string,
+    rememberMe: boolean,
+    originalUrl?: string
+  ) {
+    await this.doAuthentication(
+      async () => this.service.login(alias, password),
+      rememberMe,
+      originalUrl
+    );
   }
 
   protected navigate(originalUrl?: string): void {

@@ -14,9 +14,7 @@ export interface AuthenticationView extends View {
   navigate: (to: To, options?: NavigateOptions) => void;
 }
 
-export abstract class AuthenticationPresenter<
-  Params
-> extends Presenter<AuthenticationView> {
+export abstract class AuthenticationPresenter extends Presenter<AuthenticationView> {
   private _service: UserService;
   constructor(view: AuthenticationView) {
     super(view);
@@ -27,14 +25,15 @@ export abstract class AuthenticationPresenter<
     return this._service;
   }
 
+  //Pass in a function instead? 
   public async doAuthentication(
-    authParams: Params,
+    operation:() => Promise<[User, AuthToken]>,
     rememberMe: boolean,
     originalUrl?: string
   ) {
     await this.doFailureReportingOperation(async () => {
       this.view.setIsLoading(true);
-      const [user, authToken] = await this.authenticate(authParams);
+      const [user, authToken] = await operation();
 
       this.view.updateUserInfo(user, user, authToken, rememberMe);
 
@@ -43,10 +42,6 @@ export abstract class AuthenticationPresenter<
 
     this.view.setIsLoading(false);
   }
-
-  protected abstract authenticate(
-    authParams: Params
-  ): Promise<[User, AuthToken]>;
 
   protected abstract navigate(originalUrl?: string): void;
 
