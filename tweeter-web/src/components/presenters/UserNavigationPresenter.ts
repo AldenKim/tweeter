@@ -7,7 +7,7 @@ export interface UserNavigationView extends View {
   setDisplayedUser: (user: User) => void;
 }
 
-export class UserNavigationPresenter extends Presenter {
+export class UserNavigationPresenter extends Presenter<UserNavigationView> {
   private service: UserService;
 
   public constructor(view: UserNavigationView) {

@@ -7,7 +7,7 @@ export interface PostStatusView extends MessageView {
   setPost: (post: string) => void;
 }
 
-export class PostStatusPresenter extends Presenter {
+export class PostStatusPresenter extends Presenter<PostStatusView> {
   private service: StatusService;
 
   public constructor(view: PostStatusView) {

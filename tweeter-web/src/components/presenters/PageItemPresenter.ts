@@ -7,7 +7,7 @@ export interface PageItemView<T> extends View {
   addItems: (newItems: T[]) => void;
 }
 
-export abstract class PageItemPresenter<T, U> extends Presenter {
+export abstract class PageItemPresenter<T, U> extends Presenter<PageItemView<T>> {
   private _service: U;
 
   private _hasMoreItems = true;
@@ -44,11 +44,7 @@ export abstract class PageItemPresenter<T, U> extends Presenter {
     this.lastItem = null;
     this.hasMoreItems = true;
   }
-
-  protected get view(): PageItemView<T> {
-    return super.view as PageItemView<T>; 
-  }
-
+  
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     await this.doFailureReportingOperation(async () => {
       const [newItems, hasMore] = await this.getMoreItems(

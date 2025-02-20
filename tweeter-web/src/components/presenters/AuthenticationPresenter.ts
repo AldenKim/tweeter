@@ -13,7 +13,7 @@ export interface AuthenticationView extends View {
   navigate: (to: To, options?: NavigateOptions) => void;
 }
 
-export abstract class AuthenticationPresenter extends Presenter {
+export abstract class AuthenticationPresenter extends Presenter<AuthenticationView> {
   constructor(view: AuthenticationView) {
     super(view);
   }

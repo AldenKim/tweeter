@@ -6,16 +6,12 @@ export interface AppNavbarView extends MessageView {
   clearUserInfo(): void;
 }
 
-export class AppNavbarPresenter extends Presenter {
+export class AppNavbarPresenter extends Presenter<AppNavbarView> {
   private service: UserService;
 
   public constructor(view: AppNavbarView) {
     super(view);
     this.service = new UserService();
-  }
-
-  protected get view(): AppNavbarView {
-    return super.view as AppNavbarView;
   }
 
   public async logOut(authToken: AuthToken) {

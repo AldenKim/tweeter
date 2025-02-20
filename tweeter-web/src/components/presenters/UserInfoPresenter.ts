@@ -9,7 +9,7 @@ export interface UserInfoView extends MessageView {
   setIsLoading: (isLoading: boolean) => void;
 }
 
-export class UserInfoPresenter extends Presenter {
+export class UserInfoPresenter extends Presenter<UserInfoView> {
   private service: UserService;
 
   public constructor(view: UserInfoView) {
