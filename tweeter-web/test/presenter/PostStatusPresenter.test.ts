@@ -49,11 +49,11 @@ describe("PostStatusPresenter", () => {
   it("presenter calls postStatus on the post status service with the correct status string and auth token", async () => {
     await postStatusPresenter.submitPost(postString, user, authToken);
 
+    verify(mockStatusService.postStatus(authToken, anything())).once();
+
     const [capturedAuthToken, capturedStatus] = capture(
       mockStatusService.postStatus
     ).last();
-
-    verify(mockStatusService.postStatus(authToken, anything())).once();
 
     expect(capturedAuthToken).toEqual(authToken);
     expect(capturedStatus.post).toEqual(postString);
@@ -75,10 +75,14 @@ describe("PostStatusPresenter", () => {
   it("the presenter tells the view to display an error message and clear the last info message and does not tell it to clear the post or display a status posted message when not successful", async () => {
     const error = new Error("An error occured");
     when(mockStatusService.postStatus(authToken, anything())).thenThrow(error);
-    
+
     await postStatusPresenter.submitPost(postString, user, authToken);
 
-    verify(mockPostStatusView.displayErrorMessage("Failed to post the status because of exception: An error occured")).once();
+    verify(
+      mockPostStatusView.displayErrorMessage(
+        "Failed to post the status because of exception: An error occured"
+      )
+    ).once();
 
     verify(mockPostStatusView.setPost("")).never();
     verify(
