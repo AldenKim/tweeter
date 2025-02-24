@@ -27,6 +27,7 @@ export class RegisterPresenter extends AuthenticationPresenter {
   protected navigate(): void {
     this.view.navigate("/");
   }
+  
   protected getItemDescription(): string {
     return "register user";
   }
