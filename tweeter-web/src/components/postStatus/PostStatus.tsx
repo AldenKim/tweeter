@@ -30,7 +30,7 @@ const PostStatus = (props: Props) => {
     clearLastInfoMessage: clearLastInfoMessage,
   };
       
-  const [presenter] = useState(new PostStatusPresenter(listener));
+  const [presenter] = useState(props.presenter ?? new PostStatusPresenter(listener));
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -48,6 +48,7 @@ const PostStatus = (props: Props) => {
           <textarea
             className="form-control"
             id="postStatusTextArea"
+            aria-label="postStatusText"
             rows={10}
             placeholder="What's on your mind?"
             value={post}
