@@ -4,7 +4,11 @@ import useToastListener from "../toaster/ToastListenerHook";
 import userInfoHook from "../userInfo/UserInfoHook";
 import { PostStatusPresenter, PostStatusView } from "../presenters/PostStatusPresenter";
 
-const PostStatus = () => {
+interface Props {
+  presenter?: PostStatusPresenter;
+}
+
+const PostStatus = (props: Props) => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
 
