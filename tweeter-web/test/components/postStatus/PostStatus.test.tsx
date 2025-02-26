@@ -5,7 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import React from "react";
 import { PostStatusPresenter } from "../../../src/components/presenters/PostStatusPresenter";
 import userEvent from "@testing-library/user-event";
-import { anything, instance, mock, verify, when } from "@typestrong/ts-mockito";
+import { anything, instance, mock, verify } from "@typestrong/ts-mockito";
 import { AuthToken, User } from "tweeter-shared";
 import userInfoHook from "../../../src/components/userInfo/UserInfoHook";
 
