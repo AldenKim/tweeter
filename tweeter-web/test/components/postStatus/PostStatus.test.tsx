@@ -9,7 +9,11 @@ import { anything, instance, mock, verify } from "@typestrong/ts-mockito";
 import { AuthToken, User } from "tweeter-shared";
 import userInfoHook from "../../../src/components/userInfo/UserInfoHook";
 
-jest.mock("../../../src/components/userInfo/UserInfoHook");
+jest.mock("../../../src/components/userInfo/UserInfoHook", () => ({
+  ...jest.requireActual("../../../src/components/userInfo/UserInfoHook"),
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 describe("PostStatus Component", () => {
   const userTest = new User("test", "test", "test", "test");
