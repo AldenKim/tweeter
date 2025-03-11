@@ -1,0 +1,6 @@
+BUCKET='tweeter-alden-kim'
+LAMBDA_ROLE='arn:aws:iam::905418091492:user/aldenkim'
+EDIT_LAMBDALIST='
+tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+'
+LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:1'
