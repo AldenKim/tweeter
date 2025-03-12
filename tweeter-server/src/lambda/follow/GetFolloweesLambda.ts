@@ -1,5 +1,5 @@
+import { PageUserItemRequest }
 
-
-export const handler = async (request) => {
+export const handler = async (request: PagedUserItemRequest) => {
 
 }
