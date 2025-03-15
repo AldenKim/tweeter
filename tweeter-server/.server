@@ -2,5 +2,6 @@ BUCKET='tweeter-alden-kim'
 LAMBDA_ROLE='arn:aws:iam::905418091492:role/tweeter-alden-kim-role'
 EDIT_LAMBDALIST='
 tweeterGetFollowees | lambda/follow/GetFolloweesLambda.handler
+tweeterGetFollowers | lambda/follow/GetFollowersLambda.handler
 '
 LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:2'
