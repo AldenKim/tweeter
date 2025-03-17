@@ -21,5 +21,6 @@ describe("Server Facade Integration Tests", () => {
 
     expect(Array.isArray(followers)).toBe(true);
     expect(followers.length).toBeGreaterThanOrEqual(0);
+    expect(typeof hasMore).toBe("boolean");
   });
 });
