@@ -1,4 +1,7 @@
 import {
+  AuthToken,
+  LoginRequest,
+  LoginResponse,
   LogoutRequest,
   LogoutResponse,
   PagedStatusItemRequest,
@@ -145,6 +148,37 @@ export class ServerFacade {
 
     // Handle errors
     if (!response.success) {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async login(request: LoginRequest): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      LoginRequest,
+      LoginResponse
+    >(request, "/login");
+
+    const user: User | null =
+      response.success && response.user
+        ? (User.fromDto(response.user) as User)
+        : null;
+
+    const authToken: AuthToken | null =
+      response.success && response.authToken
+        ? (AuthToken.fromDto(response.authToken) as AuthToken)
+        : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null) {
+        throw new Error(`No user found`);
+      } else if (authToken == null) {
+        throw new Error(`No authToken generated/returned`);
+      } else {
+        return [user, authToken];
+      }
+    } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
     }
