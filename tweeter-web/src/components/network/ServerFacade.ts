@@ -1,4 +1,6 @@
 import {
+  LogoutRequest,
+  LogoutResponse,
   PagedStatusItemRequest,
   PagedStatusItemResponse,
   PagedUserItemRequest,
@@ -122,13 +124,24 @@ export class ServerFacade {
     }
   }
 
-  public async postNewStatus(
-    request: PostStatusRequest
-  ): Promise<void> {
+  public async postNewStatus(request: PostStatusRequest): Promise<void> {
     const response = await this.clientCommunicator.doPost<
       PostStatusRequest,
       PostStatusResponse
     >(request, "/poststatus");
+
+    // Handle errors
+    if (!response.success) {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async logout(request: LogoutRequest): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      LogoutRequest,
+      LogoutResponse
+    >(request, "/logout");
 
     // Handle errors
     if (!response.success) {
