@@ -22,7 +22,7 @@ export class StatusService {
   }
 
   public async postStatus(
-    authToken: AuthToken,
+    token: string,
     newStatus: StatusDto
   ): Promise<void> {
     // Pause so we can see the logging out message. Remove when connected to the server
