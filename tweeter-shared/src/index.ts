@@ -11,18 +11,21 @@ export { AuthToken } from "./model/domain/AuthToken";
 //DTOS
 export type { UserDto } from "./model/dto/UserDto";
 export type { StatusDto } from "./model/dto/StatusDto";
+export type { AuthTokenDto } from "./model/dto/AuthTokenDto";
 
 //Requests
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 export type { PagedStatusItemRequest } from "./model/net/request/PagedStatusItemRequest";
 export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";
 export type { LogoutRequest } from "./model/net/request/LogoutRequest";
+export type { LoginRequest } from "./model/net/request/LoginRequest";
 
 //Responses
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
 export type { PagedStatusItemResponse } from "./model/net/response/PagedStatusItemResponse";
 export type { PostStatusResponse } from "./model/net/response/PostStatusResponse";
 export type { LogoutResponse } from "./model/net/response/LogoutResponse";
+export type { LoginResponse } from "./model/net/response/LoginResponse";
 
 //Other
 export { FakeData } from "./util/FakeData";
