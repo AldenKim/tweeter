@@ -256,4 +256,21 @@ export class ServerFacade {
       throw new Error(response.message ?? undefined);
     }
   }
+
+  public async getFollowerCount(request: FollowRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      GetCountResponse
+    >(request, "/getfollowercount");
+
+    const count: number = response.count;
+
+    // Handle errors
+    if (response.success) {
+      return count;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
 }
