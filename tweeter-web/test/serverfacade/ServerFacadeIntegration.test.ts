@@ -1,4 +1,4 @@
-import { PagedUserItemRequest, RegisterRequest } from "tweeter-shared";
+import { FollowRequest, PagedUserItemRequest, RegisterRequest } from "tweeter-shared";
 import { ServerFacade } from "../../src/components/network/ServerFacade";
 import "isomorphic-fetch";
 
@@ -46,5 +46,39 @@ describe("Server Facade Integration Tests", () => {
     expect(Array.isArray(followers)).toBe(true);
     expect(followers.length).toBeGreaterThanOrEqual(0);
     expect(typeof hasMore).toBe("boolean");
+  });
+
+  test("Get Following Count Integrations Test", async () => {
+    const request: FollowRequest = {
+      token: "value1",
+      user: {
+        firstName: "Allen",
+        lastName: "Anderson",
+        alias: "@allen",
+        imageUrl: ""
+      }
+    };
+
+    const count = await serverFacade.getFolloweeCount(request);
+
+    expect(count).toBeDefined();
+    expect(count).toBeGreaterThanOrEqual(0);
+  });
+
+  test("Get Followers Count Integrations Test", async () => {
+    const request: FollowRequest = {
+      token: "value1",
+      user: {
+        firstName: "Allen",
+        lastName: "Anderson",
+        alias: "@allen",
+        imageUrl: ""
+      }
+    };
+
+    const count = await serverFacade.getFollowerCount(request);
+
+    expect(count).toBeDefined();
+    expect(count).toBeGreaterThanOrEqual(0);
   });
 });
