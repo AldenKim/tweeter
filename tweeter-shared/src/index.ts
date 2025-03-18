@@ -21,6 +21,8 @@ export type { LogoutRequest } from "./model/net/request/LogoutRequest";
 export type { LoginRequest } from "./model/net/request/LoginRequest";
 export type { RegisterRequest } from "./model/net/request/RegisterRequest";
 export type { GetIsFollowerRequest } from "./model/net/request/GetIsFollowerRequest";
+export type { FollowRequest } from "./model/net/request/FollowRequest";
+export type { GetUserRequest } from "./model/net/request/GetUserRequest"
 
 //Responses
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
@@ -30,6 +32,9 @@ export type { LogoutResponse } from "./model/net/response/LogoutResponse";
 export type { LoginResponse } from "./model/net/response/LoginResponse";
 export type { RegisterResponse } from "./model/net/response/RegisterResponse";
 export type { GetIsFollowerResponse } from "./model/net/response/GetIsFollowerResponse";
+export type { FollowResponse } from "./model/net/response/FollowResponse";
+export type { GetCountResponse } from "./model/net/response/GetCountResponse";
+export type { GetUserResponse } from "./model/net/response/GetUserResponse";
 
 //Other
 export { FakeData } from "./util/FakeData";
