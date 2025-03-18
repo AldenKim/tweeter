@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { AuthToken, FakeData, LoginRequest, LogoutRequest, User } from "tweeter-shared";
+import { AuthToken, FakeData, LoginRequest, LogoutRequest, RegisterRequest, User } from "tweeter-shared";
 import { ServerFacade } from "../../network/ServerFacade";
 
 export class UserService {
@@ -38,13 +38,16 @@ export class UserService {
       Buffer.from(userImageBytes).toString("base64");
 
     // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+    const request: RegisterRequest = {
+      firstName: firstName,
+      lastName: lastName,
+      alias: alias,
+      password: password,
+      userImageBytes: imageStringBase64,
+      imageFileExtension: imageFileExtension,
+    };
 
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
-
-    return [user, FakeData.instance.authToken];
+    return this.serverFacade.register(request);
   }
 
   public async getIsFollowerStatus(
