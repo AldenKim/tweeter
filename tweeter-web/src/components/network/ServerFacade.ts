@@ -1,5 +1,7 @@
 import {
   AuthToken,
+  GetIsFollowerRequest,
+  GetIsFollowerResponse,
   LoginRequest,
   LoginResponse,
   LogoutRequest,
@@ -211,6 +213,23 @@ export class ServerFacade {
       } else {
         return [user, authToken];
       }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async getIsFollowerStatus(request: GetIsFollowerRequest): Promise<boolean> {
+    const response = await this.clientCommunicator.doPost<
+      GetIsFollowerRequest,
+      GetIsFollowerResponse
+    >(request, "/getisfollowerstatus");
+
+    const isFollower: boolean = response.isFollower;
+
+    // Handle errors
+    if (response.success) {
+      return isFollower;
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
