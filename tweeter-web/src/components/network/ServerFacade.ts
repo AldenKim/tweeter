@@ -1,5 +1,7 @@
 import {
   AuthToken,
+  FollowRequest,
+  GetCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
   LoginRequest,
@@ -219,7 +221,9 @@ export class ServerFacade {
     }
   }
 
-  public async getIsFollowerStatus(request: GetIsFollowerRequest): Promise<boolean> {
+  public async getIsFollowerStatus(
+    request: GetIsFollowerRequest
+  ): Promise<boolean> {
     const response = await this.clientCommunicator.doPost<
       GetIsFollowerRequest,
       GetIsFollowerResponse
@@ -230,6 +234,23 @@ export class ServerFacade {
     // Handle errors
     if (response.success) {
       return isFollower;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async getFolloweeCount(request: FollowRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      GetCountResponse
+    >(request, "/getfolloweecount");
+
+    const count: number = response.count;
+
+    // Handle errors
+    if (response.success) {
+      return count;
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
