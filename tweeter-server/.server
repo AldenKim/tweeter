@@ -9,5 +9,6 @@ tweeterPostStatus | lambda/status/PostStatusLambda.handler
 tweeterLogout | lambda/user/LogoutLambda.handler
 tweeterLogin | lambda/user/LoginLambda.handler
 tweeterRegister | lambda/user/RegisterLambda.handler
+tweeterGetIsFollowerStatus | lambda/user/GetIsFollowerStatusLambda.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:7'
+LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:8'
