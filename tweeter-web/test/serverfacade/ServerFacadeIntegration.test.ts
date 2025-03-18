@@ -1,12 +1,36 @@
-import { PagedUserItemRequest } from "tweeter-shared";
+import { PagedUserItemRequest, RegisterRequest } from "tweeter-shared";
 import { ServerFacade } from "../../src/components/network/ServerFacade";
-import 'isomorphic-fetch';
+import "isomorphic-fetch";
 
 describe("Server Facade Integration Tests", () => {
   let serverFacade: ServerFacade;
 
   beforeAll(() => {
     serverFacade = new ServerFacade();
+  });
+
+  test("Register Integrations Test", async () => {
+    const request: RegisterRequest = {
+      firstName: "value1",
+      lastName: "value2",
+      alias: "value3",
+      password: "value4",
+      userImageBytes: "value5",
+      imageFileExtension: "value6",
+    };
+
+    const [user, authToken] = await serverFacade.register(request);
+
+    expect(user).toBeDefined();
+    expect(authToken).toBeDefined();
+    expect(typeof user.alias).toBe("string");
+    expect(typeof user.firstName).toBe("string");
+    expect(typeof user.lastName).toBe("string");
+
+    expect(authToken.token).toBeDefined();
+    expect(typeof authToken.token).toBe("string");
+    expect(authToken.timestamp).toBeDefined();
+    expect(typeof authToken.timestamp).toBe("number");
   });
 
   test("Get Followers Integrations Test", async () => {
