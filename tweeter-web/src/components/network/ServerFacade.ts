@@ -1,9 +1,12 @@
 import {
   AuthToken,
   FollowRequest,
+  FollowResponse,
   GetCountResponse,
   GetIsFollowerRequest,
   GetIsFollowerResponse,
+  GetUserRequest,
+  GetUserResponse,
   LoginRequest,
   LoginResponse,
   LogoutRequest,
@@ -268,6 +271,63 @@ export class ServerFacade {
     // Handle errors
     if (response.success) {
       return count;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async follow(
+    request: FollowRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      FollowResponse
+    >(request, "/follow");
+
+    const followerCount: number = response.followerCount;
+    const followeeCount: number = response.followeeCount;
+
+    // Handle errors
+    if (response.success) {
+      return [followerCount, followeeCount];
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async unfollow(
+    request: FollowRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<
+      FollowRequest,
+      FollowResponse
+    >(request, "/unfollow");
+
+    const followerCount: number = response.followerCount;
+    const followeeCount: number = response.followeeCount;
+
+    // Handle errors
+    if (response.success) {
+      return [followerCount, followeeCount];
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async getUser(request: GetUserRequest): Promise<User | null> {
+    const response = await this.clientCommunicator.doPost<
+      GetUserRequest,
+      GetUserResponse
+    >(request, "/getuser");
+
+    const user: User | null = User.fromDto(response.user);
+
+    // Handle errors
+    if (response.success) {
+      return user;
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
