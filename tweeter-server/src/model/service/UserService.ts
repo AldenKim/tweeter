@@ -1,7 +1,15 @@
 import { Buffer } from "buffer";
 import { AuthToken, AuthTokenDto, FakeData, User, UserDto } from "tweeter-shared";
+import { DaoFactory } from "../../daos/DaoFactory";
+import { UsersDao } from "../../daos/UsersDao";
 
 export class UserService {
+  private readonly usersDao: UsersDao;
+
+  public constructor(factory: DaoFactory) {
+    this.usersDao = factory.createUsersDao();
+  }
+
   public async logout(authToken: string): Promise<void> {
     // Pause so we can see the logging out message. Delete when the call to the server is implemented.
     await new Promise((res) => setTimeout(res, 1000));
@@ -12,13 +20,21 @@ export class UserService {
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
     // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+    const user = await this.usersDao.getUser(alias);
 
     if (user === null) {
-      throw new Error("Invalid alias or password");
+      throw new Error("[Bad Request] Invalid alias");
     }
 
-    return [user.dto, FakeData.instance.authToken.dto];
+    const stored_password = await this.usersDao.getPassword(alias);
+
+    if(stored_password !== password) {
+      throw new Error("[Bad Request] Invalid password");
+    }
+
+    const authToken = 
+
+    return [user, FakeData.instance.authToken.dto];
   }
 
   public async register(
