@@ -156,8 +156,18 @@ export class UserService {
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    // TODO: Replace with the result of calling server
-    const user = FakeData.instance.findUserByAlias(alias);
-    return user ? user.dto : null;
+    const auth_token = this.sessionsDao.getSession(token);
+    if (auth_token === null) {
+      throw new Error("[Bad Request] Invalid Token");
+    }
+
+    
+
+    const user = await this.usersDao.getUser(alias);
+    return user ? user : null;
   }
+
+  //get user
+  //get follower and followee count
+  //All pages
 }
