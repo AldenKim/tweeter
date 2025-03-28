@@ -14,14 +14,16 @@ export class DynamoDBUsersDao implements UsersDao {
   private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
   public async getUser(handle: string): Promise<UserDto | null> {
+    console.log(handle);
     const params = {
       TableName: this.tableName,
       Key: {
-        handle: handle,
+        [this.handleAttr]: handle,
       },
     };
 
     const output = await this.client.send(new GetCommand(params));
+    console.log(output);
 
     if (
       output.Item == undefined ||
@@ -29,6 +31,7 @@ export class DynamoDBUsersDao implements UsersDao {
       output.Item[this.lastNameAttr] == undefined ||
       output.Item[this.handleAttr] == undefined
     ) {
+      console.log("didnt find it");
       return null;
     } else {
       const user = new User(
@@ -45,17 +48,15 @@ export class DynamoDBUsersDao implements UsersDao {
     const params = {
       TableName: this.tableName,
       Key: {
-        handle: handle,
+        [this.handleAttr]: handle,
       },
+      ProjectionExpressions: this.passwordAttr,
     };
 
     const output = await this.client.send(new GetCommand(params));
 
     if (
       output.Item == undefined ||
-      output.Item[this.firstNameAttr] == undefined ||
-      output.Item[this.lastNameAttr] == undefined ||
-      output.Item[this.handleAttr] == undefined ||
       output.Item[this.passwordAttr] == undefined
     ) {
       return null;

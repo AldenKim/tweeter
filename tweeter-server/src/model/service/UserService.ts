@@ -2,12 +2,15 @@ import { Buffer } from "buffer";
 import { AuthToken, AuthTokenDto, FakeData, User, UserDto } from "tweeter-shared";
 import { DaoFactory } from "../../daos/DaoFactory";
 import { UsersDao } from "../../daos/UsersDao";
+import { SessionsDao } from "../../daos/SessionsDao";
 
 export class UserService {
   private readonly usersDao: UsersDao;
+  private readonly sessionsDao: SessionsDao;
 
   public constructor(factory: DaoFactory) {
     this.usersDao = factory.createUsersDao();
+    this.sessionsDao = factory.createSessionsDao();
   }
 
   public async logout(authToken: string): Promise<void> {
@@ -19,22 +22,26 @@ export class UserService {
     alias: string,
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
     const user = await this.usersDao.getUser(alias);
 
     if (user === null) {
-      throw new Error("[Bad Request] Invalid alias");
+      throw new Error("[Bad Request]: Invalid alias");
     }
 
     const stored_password = await this.usersDao.getPassword(alias);
 
+    //TODO, CHANGE TO CHECK PASSWORD HASH LATER ONCE REGISTER IS DONE
     if(stored_password !== password) {
-      throw new Error("[Bad Request] Invalid password");
+      throw new Error("[Bad Request]: Invalid password");
     }
 
-    const authToken = 
+    const auth_token = await this.sessionsDao.createSession();
 
-    return [user, FakeData.instance.authToken.dto];
+    if (auth_token === null) {
+      throw new Error("[Bad Request]: AuthToken not generated");
+    }
+
+    return [user, auth_token];
   }
 
   public async register(
