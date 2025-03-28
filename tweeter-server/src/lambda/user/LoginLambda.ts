@@ -1,6 +1,6 @@
 import { LoginRequest, LoginResponse } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
-import { DynamoDBDaoFactory } from "../../daos/DynamoDBDaoFactory";
+import { DynamoDBDaoFactory } from "../../daos/factory/DynamoDBDaoFactory";
 
 export const handler = async (
   request: LoginRequest
