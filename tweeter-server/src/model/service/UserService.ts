@@ -1,16 +1,20 @@
 import { Buffer } from "buffer";
 import { AuthToken, AuthTokenDto, FakeData, User, UserDto } from "tweeter-shared";
-import { DaoFactory } from "../../daos/DaoFactory";
+import { DaoFactory } from "../../daos/factory/DaoFactory";
 import { UsersDao } from "../../daos/UsersDao";
 import { SessionsDao } from "../../daos/SessionsDao";
+import { S3DaoInterface } from "../../daos/S3DaoInterface";
+import bcrypt from "bcryptjs";
 
 export class UserService {
   private readonly usersDao: UsersDao;
   private readonly sessionsDao: SessionsDao;
+  private readonly s3Dao: S3DaoInterface;
 
   public constructor(factory: DaoFactory) {
     this.usersDao = factory.createUsersDao();
     this.sessionsDao = factory.createSessionsDao();
+    this.s3Dao = factory.createS3Dao();
   }
 
   public async logout(authToken: string): Promise<void> {
@@ -30,8 +34,11 @@ export class UserService {
 
     const stored_password = await this.usersDao.getPassword(alias);
 
-    //TODO, CHANGE TO CHECK PASSWORD HASH LATER ONCE REGISTER IS DONE
-    if(stored_password !== password) {
+    if (stored_password === null) {
+      throw new Error("[Bad Request]: Stored password not retrieved");
+    }
+
+    if(await bcrypt.compare(password, stored_password)) {
       throw new Error("[Bad Request]: Invalid password");
     }
 
@@ -54,13 +61,28 @@ export class UserService {
   ): Promise<[UserDto, AuthTokenDto]> {
 
     // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+    if (this.usersDao.getUser(alias) !== null) {
+      throw new Error("[Bad Request] user alias already taken");
+    }
+
+    const imageUrl = await this.s3Dao.putImage(imageFileExtension, userImageBytes);
+
+    const salt = await bcrypt.genSalt();
+    const hash = bcrypt.hashSync(password, salt);
+
+    const user = await this.usersDao.addUser(new User(firstName, lastName, alias, imageUrl), hash); 
 
     if (user === null) {
       throw new Error("Invalid registration");
     }
 
-    return [user.dto, FakeData.instance.authToken.dto];
+    const auth_token = await this.sessionsDao.createSession();
+
+    if (auth_token === null) {
+      throw new Error("[Bad Request]: AuthToken not generated");
+    }
+
+    return [user, auth_token];
   }
 
   public async getIsFollowerStatus(
