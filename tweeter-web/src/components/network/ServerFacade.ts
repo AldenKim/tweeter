@@ -197,7 +197,7 @@ export class ServerFacade {
     const response = await this.clientCommunicator.doPost<
       RegisterRequest,
       RegisterResponse
-    >(request, "/login");
+    >(request, "/register");
 
     const user: User | null =
       response.success && response.user

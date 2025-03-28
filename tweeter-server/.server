@@ -16,4 +16,4 @@ tweeterFollow | lambda/user/FollowLambda.handler
 tweeterUnfollow | lambda/user/UnfollowLambda.handler
 tweeterGetUser | lambda/user/GetUserLambda.handler
 '
-LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:11'
+LAMBDALAYER_ARN='arn:aws:lambda:us-west-2:905418091492:layer:tweeterLambdaDependencies:13'

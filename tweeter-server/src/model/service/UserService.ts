@@ -4,7 +4,7 @@ import { DaoFactory } from "../../daos/factory/DaoFactory";
 import { UsersDao } from "../../daos/UsersDao";
 import { SessionsDao } from "../../daos/SessionsDao";
 import { S3DaoInterface } from "../../daos/S3DaoInterface";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 
 export class UserService {
   private readonly usersDao: UsersDao;
@@ -29,23 +29,23 @@ export class UserService {
     const user = await this.usersDao.getUser(alias);
 
     if (user === null) {
-      throw new Error("[Bad Request]: Invalid alias");
+      throw new Error("Bad Request Invalid alias");
     }
 
     const stored_password = await this.usersDao.getPassword(alias);
 
     if (stored_password === null) {
-      throw new Error("[Bad Request]: Stored password not retrieved");
+      throw new Error("Bad Request Stored password not retrieved");
     }
 
-    if(await bcrypt.compare(password, stored_password)) {
-      throw new Error("[Bad Request]: Invalid password");
+    if(stored_password !== password) {
+      throw new Error("Bad Request Invalid password");
     }
 
     const auth_token = await this.sessionsDao.createSession();
 
     if (auth_token === null) {
-      throw new Error("[Bad Request]: AuthToken not generated");
+      throw new Error("Bad Request AuthToken not generated");
     }
 
     return [user, auth_token];
@@ -61,8 +61,8 @@ export class UserService {
   ): Promise<[UserDto, AuthTokenDto]> {
 
     // TODO: Replace with the result of calling the server
-    if (this.usersDao.getUser(alias) !== null) {
-      throw new Error("[Bad Request] user alias already taken");
+    if (await this.usersDao.getUser(alias) !== null) {
+      throw new Error("Bad Request user alias already taken");
     }
 
     const imageUrl = await this.s3Dao.putImage(imageFileExtension, userImageBytes);
@@ -73,13 +73,13 @@ export class UserService {
     const user = await this.usersDao.addUser(new User(firstName, lastName, alias, imageUrl), hash); 
 
     if (user === null) {
-      throw new Error("Invalid registration");
+      throw new Error("Bad Request Invalid registration");
     }
 
     const auth_token = await this.sessionsDao.createSession();
 
     if (auth_token === null) {
-      throw new Error("[Bad Request]: AuthToken not generated");
+      throw new Error("Bad Request AuthToken not generated");
     }
 
     return [user, auth_token];
