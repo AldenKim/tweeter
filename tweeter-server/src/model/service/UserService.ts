@@ -29,23 +29,23 @@ export class UserService {
     const user = await this.usersDao.getUser(alias);
 
     if (user === null) {
-      throw new Error("Bad Request Invalid alias");
+      throw new Error("[Bad Request] Invalid alias");
     }
 
     const stored_password = await this.usersDao.getPassword(alias);
 
     if (stored_password === null) {
-      throw new Error("Bad Request Stored password not retrieved");
+      throw new Error("[Bad Request] Stored password not retrieved");
     }
 
     if(stored_password !== password) {
-      throw new Error("Bad Request Invalid password");
+      throw new Error("[Bad Request] Invalid password");
     }
 
     const auth_token = await this.sessionsDao.createSession();
 
     if (auth_token === null) {
-      throw new Error("Bad Request AuthToken not generated");
+      throw new Error("[Bad Request] AuthToken not generated");
     }
 
     return [user, auth_token];
@@ -62,7 +62,7 @@ export class UserService {
 
     // TODO: Replace with the result of calling the server
     if (await this.usersDao.getUser(alias) !== null) {
-      throw new Error("Bad Request user alias already taken");
+      throw new Error("[Bad Request] user alias already taken");
     }
 
     const imageUrl = await this.s3Dao.putImage(imageFileExtension, userImageBytes);
@@ -73,13 +73,13 @@ export class UserService {
     const user = await this.usersDao.addUser(new User(firstName, lastName, alias, imageUrl), hash); 
 
     if (user === null) {
-      throw new Error("Bad Request Invalid registration");
+      throw new Error("[Bad Request] Invalid registration");
     }
 
     const auth_token = await this.sessionsDao.createSession();
 
     if (auth_token === null) {
-      throw new Error("Bad Request AuthToken not generated");
+      throw new Error("[Bad Request] AuthToken not generated");
     }
 
     return [user, auth_token];
