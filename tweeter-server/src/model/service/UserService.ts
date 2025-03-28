@@ -38,7 +38,9 @@ export class UserService {
       throw new Error("[Bad Request] Stored password not retrieved");
     }
 
-    if(stored_password !== password) {
+    const check = await bcrypt.compare(password, stored_password);
+
+    if(!check) {
       throw new Error("[Bad Request] Invalid password");
     }
 
