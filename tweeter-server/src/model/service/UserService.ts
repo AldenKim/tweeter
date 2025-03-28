@@ -1,5 +1,11 @@
 import { Buffer } from "buffer";
-import { AuthToken, AuthTokenDto, FakeData, User, UserDto } from "tweeter-shared";
+import {
+  AuthToken,
+  AuthTokenDto,
+  FakeData,
+  User,
+  UserDto,
+} from "tweeter-shared";
 import { DaoFactory } from "../../daos/factory/DaoFactory";
 import { UsersDao } from "../../daos/UsersDao";
 import { SessionsDao } from "../../daos/SessionsDao";
@@ -18,8 +24,16 @@ export class UserService {
   }
 
   public async logout(authToken: string): Promise<void> {
-    // Pause so we can see the logging out message. Delete when the call to the server is implemented.
-    await new Promise((res) => setTimeout(res, 1000));
+    if ((await this.sessionsDao.getSession(authToken)) === null) {
+      throw new Error("[Bad Request] Invalid Token");
+    }
+
+    try {
+      await this.sessionsDao.deleteSession(authToken);
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      throw new Error("[Server Error] Could not log out");
+    }
   }
 
   public async login(
@@ -40,7 +54,7 @@ export class UserService {
 
     const check = await bcrypt.compare(password, stored_password);
 
-    if(!check) {
+    if (!check) {
       throw new Error("[Bad Request] Invalid password");
     }
 
@@ -61,18 +75,23 @@ export class UserService {
     userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-
     // TODO: Replace with the result of calling the server
-    if (await this.usersDao.getUser(alias) !== null) {
+    if ((await this.usersDao.getUser(alias)) !== null) {
       throw new Error("[Bad Request] user alias already taken");
     }
 
-    const imageUrl = await this.s3Dao.putImage(imageFileExtension, userImageBytes);
+    const imageUrl = await this.s3Dao.putImage(
+      imageFileExtension,
+      userImageBytes
+    );
 
     const salt = await bcrypt.genSalt();
     const hash = bcrypt.hashSync(password, salt);
 
-    const user = await this.usersDao.addUser(new User(firstName, lastName, alias, imageUrl), hash); 
+    const user = await this.usersDao.addUser(
+      new User(firstName, lastName, alias, imageUrl),
+      hash
+    );
 
     if (user === null) {
       throw new Error("[Bad Request] Invalid registration");
@@ -96,18 +115,12 @@ export class UserService {
     return FakeData.instance.isFollower();
   }
 
-  public async getFolloweeCount(
-    token: string,
-    user: UserDto
-  ): Promise<number> {
+  public async getFolloweeCount(token: string, user: UserDto): Promise<number> {
     // TODO: Replace with the result of calling server
     return FakeData.instance.getFolloweeCount(user.alias);
   }
 
-  public async getFollowerCount(
-    token: string,
-    user: UserDto
-  ): Promise<number> {
+  public async getFollowerCount(token: string, user: UserDto): Promise<number> {
     // TODO: Replace with the result of calling server
     return FakeData.instance.getFollowerCount(user.alias);
   }
@@ -136,25 +149,15 @@ export class UserService {
 
     // TODO: Call the server
 
-    const followerCount = await this.getFollowerCount(
-      token,
-      userToUnfollow
-    );
-    const followeeCount = await this.getFolloweeCount(
-      token,
-      userToUnfollow
-    );
+    const followerCount = await this.getFollowerCount(token, userToUnfollow);
+    const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
 
     return [followerCount, followeeCount];
   }
 
-  public async getUser(
-    token: string,
-    alias: string
-  ): Promise<UserDto | null> {
+  public async getUser(token: string, alias: string): Promise<UserDto | null> {
     // TODO: Replace with the result of calling server
     const user = FakeData.instance.findUserByAlias(alias);
     return user ? user.dto : null;
   }
 }
-
