@@ -87,15 +87,15 @@ export class DynamoDBSessionsDao implements SessionsDao {
 
   public async checkTimeStampAndUpdate(
     auth_token: AuthTokenDto
-  ): Promise<boolean> {
+  ): Promise<void> {
     const expirationTime = 60 * 60 * 1000;
     const currentTime = Date.now();
 
     if (currentTime - auth_token.timestamp > expirationTime) {
       await this.deleteSession(auth_token.token);
-      return false;
+      throw new Error("[Bad request] session has expired, please relogin")
     }
 
-    return true;
+    await this.updateSession(auth_token.token, currentTime);
   }
 }

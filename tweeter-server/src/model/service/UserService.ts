@@ -11,13 +11,15 @@ import { UsersDao } from "../../daos/UsersDao";
 import { SessionsDao } from "../../daos/SessionsDao";
 import { S3DaoInterface } from "../../daos/S3DaoInterface";
 import * as bcrypt from "bcryptjs";
+import { TokenService } from "./TokenService";
 
-export class UserService {
+export class UserService extends TokenService{
   private readonly usersDao: UsersDao;
   private readonly sessionsDao: SessionsDao;
   private readonly s3Dao: S3DaoInterface;
 
   public constructor(factory: DaoFactory) {
+    super();
     this.usersDao = factory.createUsersDao();
     this.sessionsDao = factory.createSessionsDao();
     this.s3Dao = factory.createS3Dao();
@@ -156,13 +158,8 @@ export class UserService {
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    const auth_token = this.sessionsDao.getSession(token);
-    if (auth_token === null) {
-      throw new Error("[Bad Request] Invalid Token");
-    }
-
+    this.validateToken(this.sessionsDao, token);
     
-
     const user = await this.usersDao.getUser(alias);
     return user ? user : null;
   }

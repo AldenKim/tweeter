@@ -5,5 +5,5 @@ export interface SessionsDao {
     getSession(token: string): Promise<AuthTokenDto | null>;
     deleteSession(token: string): Promise<void>;
     updateSession(token: string, currentTime: number): Promise<void>;
-    checkTimeStampAndUpdate(auth_token: AuthTokenDto): Promise<boolean>;
+    checkTimeStampAndUpdate(auth_token: AuthTokenDto): Promise<void>;
 }
