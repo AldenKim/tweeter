@@ -23,12 +23,22 @@ export class FollowService extends TokenService{
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
     await this.validateToken(this.sessionsDao, token);
 
     const page = await this.followsDao.getPageOfFollowers(userAlias, pageSize, lastItem?.alias);
 
-    
+    let userDtoList: UserDto[] = [];
+
+    for(const item of page.values) {
+      const user = await this.usersDao.getUser(item.follower_handle);
+      if (user) {
+        userDtoList.push(user);
+      }
+    }
+
+    console.log(userDtoList.length);
+
+    return [userDtoList, page.hasMorePages];
   }
 
   public async loadMoreFollowees(
