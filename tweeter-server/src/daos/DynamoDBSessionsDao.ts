@@ -77,9 +77,13 @@ export class DynamoDBSessionsDao implements SessionsDao {
       Key: {
         [this.authTokenAttr]: token,
       },
-      ExpressionAttributeValues: { ":inc": 1 },
-      UpdateExpression:
-        "SET " + this.timeStampAttr + " = " + currentTime + " + :inc",
+      ExpressionAttributeNames: {
+        "#ts": this.timeStampAttr, 
+      },
+      ExpressionAttributeValues: {
+        ":newTime": currentTime,
+      },
+      UpdateExpression: "SET #ts = :newTime",
     };
 
     await this.client.send(new UpdateCommand(params));
@@ -93,7 +97,7 @@ export class DynamoDBSessionsDao implements SessionsDao {
 
     if (currentTime - auth_token.timestamp > expirationTime) {
       await this.deleteSession(auth_token.token);
-      throw new Error("[Bad request] session has expired, please relogin")
+      throw new Error("[Bad request] session has expired, please relogin");
     }
 
     await this.updateSession(auth_token.token, currentTime);

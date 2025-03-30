@@ -158,13 +158,12 @@ export class UserService extends TokenService{
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    this.validateToken(this.sessionsDao, token);
-    
+    await this.validateToken(this.sessionsDao, token);
+
     const user = await this.usersDao.getUser(alias);
     return user ? user : null;
   }
 
-  //get user
   //get follower and followee count
   //All pages
 }
