@@ -26,10 +26,6 @@ export class UserService extends TokenService{
   }
 
   public async logout(authToken: string): Promise<void> {
-    if ((await this.sessionsDao.getSession(authToken)) === null) {
-      throw new Error("[Bad Request] Invalid Token");
-    }
-
     try {
       await this.sessionsDao.deleteSession(authToken);
     } catch (error) {
