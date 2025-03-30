@@ -5,7 +5,7 @@ import { TokenService } from "./TokenService";
 import { SessionsDao } from "../../daos/SessionsDao";
 import { UsersDao } from "../../daos/UsersDao";
 
-export class FollowService extends TokenService{
+export class FollowService extends TokenService {
   private followsDao: FollowsDao;
   private sessionsDao: SessionsDao;
   private usersDao: UsersDao;
@@ -23,22 +23,16 @@ export class FollowService extends TokenService{
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    await this.validateToken(this.sessionsDao, token);
-
-    const page = await this.followsDao.getPageOfFollowers(userAlias, pageSize, lastItem?.alias);
-
-    let userDtoList: UserDto[] = [];
-
-    for(const item of page.values) {
-      const user = await this.usersDao.getUser(item.follower_handle);
-      if (user) {
-        userDtoList.push(user);
-      }
-    }
-
-    console.log(userDtoList.length);
-
-    return [userDtoList, page.hasMorePages];
+    return await this.followsPage(
+      (alias, size, last) => this.followsDao.getPageOfFollowers(alias, size, last),
+      token,
+      userAlias,
+      pageSize,
+      lastItem,
+      this.usersDao,
+      this.sessionsDao,
+      'follower'
+    );
   }
 
   public async loadMoreFollowees(
@@ -47,13 +41,15 @@ export class FollowService extends TokenService{
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return this.getFakeData(lastItem, pageSize, userAlias);
-  }
-
-  private async getFakeData(lastItem: UserDto | null, pageSize: number, userAlias: string): Promise<[UserDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
-    const dtos = items.map((user) => user.dto);
-    return [dtos, hasMore];
+    return await this.followsPage(
+      (alias, size, last) => this.followsDao.getPageOfFollowees(alias, size, last),
+      token,
+      userAlias,
+      pageSize,
+      lastItem,
+      this.usersDao,
+      this.sessionsDao,
+      'followee'
+    );
   }
 }

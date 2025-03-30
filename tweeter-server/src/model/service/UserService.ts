@@ -79,7 +79,7 @@ export class UserService extends TokenService{
     }
 
     const imageUrl = await this.s3Dao.putImage(
-      imageFileExtension,
+      alias + "." + imageFileExtension,
       userImageBytes
     );
 
