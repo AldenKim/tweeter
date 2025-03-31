@@ -9,9 +9,10 @@ export interface StatusDao {
     pageSize: number,
     lastItem: StatusDto | null
   ): Promise<DataPage<StatusHelper>>;
-  /*getFeedPage(
+  getFeedPage(
     userAlias: string,
     pageSize: number,
-    lastItem: StatusDto | null
-  ): Promise<DataPage<StatusDto>>;*/
+    lastItem: StatusDto | null,
+    peopleFollowed:string[]
+  ): Promise<DataPage<StatusDto>>;
 }

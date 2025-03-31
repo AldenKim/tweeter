@@ -69,11 +69,12 @@ export class DyanmoDBStatusDao implements StatusDao {
     return new DataPage<StatusHelper>(items, hasMorePages);
   }
 
-  /*public async getFeedPage(
+  public async getFeedPage(
     userAlias: string,
     pageSize: number,
-    lastItem: StatusDto | null
+    lastItem: StatusDto | null,
+    peopleFollowed: string[]
   ): Promise<DataPage<StatusDto>> {
     
-  }*/
+  }
 }
