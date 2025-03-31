@@ -20,4 +20,6 @@ export interface FollowsDao {
     pageSize: number,
     lastFollowerHandle: string | undefined
   ): Promise<DataPage<Follow>>;
+  getFollowersCount(followeeHandle: string): Promise<number>;
+  getFolloweesCount(followerHandle: string): Promise<number>;
 }

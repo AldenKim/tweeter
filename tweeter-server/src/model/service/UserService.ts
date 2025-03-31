@@ -12,17 +12,20 @@ import { SessionsDao } from "../../daos/SessionsDao";
 import { S3DaoInterface } from "../../daos/S3DaoInterface";
 import * as bcrypt from "bcryptjs";
 import { TokenService } from "./TokenService";
+import { FollowsDao } from "../../daos/FollowsDao";
 
-export class UserService extends TokenService{
+export class UserService extends TokenService {
   private readonly usersDao: UsersDao;
   private readonly sessionsDao: SessionsDao;
   private readonly s3Dao: S3DaoInterface;
+  private readonly followsDao: FollowsDao;
 
   public constructor(factory: DaoFactory) {
     super();
     this.usersDao = factory.createUsersDao();
     this.sessionsDao = factory.createSessionsDao();
     this.s3Dao = factory.createS3Dao();
+    this.followsDao = factory.createFollowsDao();
   }
 
   public async logout(authToken: string): Promise<void> {
@@ -114,13 +117,23 @@ export class UserService extends TokenService{
   }
 
   public async getFolloweeCount(token: string, user: UserDto): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    try {
+      await this.validateToken(this.sessionsDao, token);
+
+      return await this.followsDao.getFolloweesCount(user.alias);
+    } catch (error) {
+      throw new Error("[Server Error] unable to get followee count");
+    }
   }
 
   public async getFollowerCount(token: string, user: UserDto): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    try {
+      await this.validateToken(this.sessionsDao, token);
+
+      return await this.followsDao.getFollowersCount(user.alias);
+    } catch (error) {
+      throw new Error("[Server Error] unable to get follower count");
+    }
   }
 
   public async follow(

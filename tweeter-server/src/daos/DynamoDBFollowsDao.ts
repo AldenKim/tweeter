@@ -97,23 +97,25 @@ export class DynamoDBFollowsDao {
         ":followerHandle": followerHandle,
       },
       Limit: pageSize,
-      ExclusiveStartKey: lastFolloweeHandle === undefined ? undefined :  {
-        [this.followerAttr]: followerHandle,
-        [this.followeeAttr]: lastFolloweeHandle,
-      },
+      ExclusiveStartKey:
+        lastFolloweeHandle === undefined
+          ? undefined
+          : {
+              [this.followerAttr]: followerHandle,
+              [this.followeeAttr]: lastFolloweeHandle,
+            },
     };
 
-
     const items: Follow[] = [];
-    const data  = await this.client.send(new QueryCommand(params));
-    
+    const data = await this.client.send(new QueryCommand(params));
+
     data.Items?.forEach((item) =>
       items.push(
         new Follow(
-            item[this.followerAttr],
-            item[this.followerNameAttr],
-            item[this.followeeAttr],
-            item[this.followeeNameAttr]
+          item[this.followerAttr],
+          item[this.followerNameAttr],
+          item[this.followeeAttr],
+          item[this.followeeNameAttr]
         )
       )
     );
@@ -135,23 +137,25 @@ export class DynamoDBFollowsDao {
         ":followeeHandle": followeeHandle,
       },
       Limit: pageSize,
-      ExclusiveStartKey: lastFollowerHandle === undefined ? undefined :  {
-        [this.followeeAttr]: followeeHandle,
-        [this.followerAttr]: lastFollowerHandle,
-      },
+      ExclusiveStartKey:
+        lastFollowerHandle === undefined
+          ? undefined
+          : {
+              [this.followeeAttr]: followeeHandle,
+              [this.followerAttr]: lastFollowerHandle,
+            },
     };
 
-
     const items: Follow[] = [];
-    const data  = await this.client.send(new QueryCommand(params));
-    
+    const data = await this.client.send(new QueryCommand(params));
+
     data.Items?.forEach((item) =>
       items.push(
         new Follow(
-            item[this.followerAttr],
-            item[this.followerNameAttr],
-            item[this.followeeAttr],
-            item[this.followeeNameAttr]
+          item[this.followerAttr],
+          item[this.followerNameAttr],
+          item[this.followeeAttr],
+          item[this.followeeNameAttr]
         )
       )
     );
@@ -160,4 +164,32 @@ export class DynamoDBFollowsDao {
     return new DataPage<Follow>(items, hasMorePages);
   }
 
+  public async getFolloweesCount(followerHandle: string): Promise<number> {
+    const params: any = {
+      TableName: this.tableName,
+      KeyConditionExpression: `${this.followerAttr} = :followerHandle`,
+      ExpressionAttributeValues: {
+        ":followerHandle": followerHandle,
+      },
+    };
+
+    const data = await this.client.send(new QueryCommand(params));
+
+    return data.Items ? data.Items.length : 0; 
+  }
+
+  public async getFollowersCount(followeeHandle: string): Promise<number> {
+    const params: any = {
+        TableName: this.tableName,
+        IndexName: this.indexName,  
+        KeyConditionExpression: `${this.followeeAttr} = :followeeHandle`, 
+        ExpressionAttributeValues: {
+          ":followeeHandle": followeeHandle,
+        },
+      };
+
+    const data = await this.client.send(new QueryCommand(params));
+
+    return data.Items ? data.Items.length : 0; 
+  }
 }
