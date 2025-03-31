@@ -13,10 +13,11 @@ export class DynamoDBSessionsDao implements SessionsDao {
   private readonly tableName = "sessions";
   private readonly authTokenAttr = "auth_token";
   private readonly timeStampAttr = "timestamp";
+  private readonly handleAttr = "handle";
 
   private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
-  public async createSession(): Promise<AuthTokenDto | null> {
+  public async createSession(handle: string): Promise<AuthTokenDto | null> {
     const auth_token = AuthToken.Generate().dto;
 
     const params = {
@@ -24,6 +25,7 @@ export class DynamoDBSessionsDao implements SessionsDao {
       Item: {
         [this.authTokenAttr]: auth_token.token,
         [this.timeStampAttr]: auth_token.timestamp,
+        [this.handleAttr]: handle
       },
     };
 
@@ -54,6 +56,26 @@ export class DynamoDBSessionsDao implements SessionsDao {
         output.Item[this.timeStampAttr]
       ).dto;
       return auth_token;
+    }
+  }
+
+  
+  public async getHandleBySession(token: string): Promise<string> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.authTokenAttr]: token,
+      },
+    };
+
+    const output = await this.client.send(new GetCommand(params));
+
+    if (
+      output.Item == undefined || output.Item[this.handleAttr] == undefined
+    ) {
+      return "";
+    } else {
+      return output.Item[this.handleAttr];
     }
   }
 

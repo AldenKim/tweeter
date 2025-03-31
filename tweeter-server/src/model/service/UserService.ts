@@ -60,7 +60,7 @@ export class UserService extends TokenService {
       throw new Error("[Bad Request] Invalid password");
     }
 
-    const auth_token = await this.sessionsDao.createSession();
+    const auth_token = await this.sessionsDao.createSession(alias);
 
     if (auth_token === null) {
       throw new Error("[Bad Request] AuthToken not generated");
@@ -98,7 +98,7 @@ export class UserService extends TokenService {
       throw new Error("[Bad Request] Invalid registration");
     }
 
-    const auth_token = await this.sessionsDao.createSession();
+    const auth_token = await this.sessionsDao.createSession(alias);
 
     if (auth_token === null) {
       throw new Error("[Bad Request] AuthToken not generated");
@@ -147,30 +147,42 @@ export class UserService extends TokenService {
     token: string,
     userToFollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    await this.validateToken(this.sessionsDao, token);
+    try {
+      const userAlias = await this.sessionsDao.getHandleBySession(token);
 
-    // TODO: Call the server
+      await this.followsDao.putFollow(
+        new Follow(userAlias, "", userToFollow.alias, "")
+      );
 
-    const followerCount = await this.getFollowerCount(token, userToFollow);
-    const followeeCount = await this.getFolloweeCount(token, userToFollow);
+      const followerCount = await this.getFollowerCount(token, userToFollow);
+      const followeeCount = await this.getFolloweeCount(token, userToFollow);
 
-    return [followerCount, followeeCount];
+      return [followerCount, followeeCount];
+    } catch (error) {
+      throw new Error("[Server Error] unable to follower user");
+    }
   }
 
   public async unfollow(
     token: string,
     userToUnfollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    await this.validateToken(this.sessionsDao, token);
+    try {
+      const userAlias = await this.sessionsDao.getHandleBySession(token);
 
-    // TODO: Call the server
+      await this.followsDao.deleteFollow(
+        new Follow(userAlias, "", userToUnfollow.alias, "")
+      );
 
-    const followerCount = await this.getFollowerCount(token, userToUnfollow);
-    const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
+      const followerCount = await this.getFollowerCount(token, userToUnfollow);
+      const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
 
-    return [followerCount, followeeCount];
+      return [followerCount, followeeCount];
+    } catch (error) {
+      throw new Error("[Server Error] unable to unfollow user");
+    }
   }
 
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
@@ -179,7 +191,5 @@ export class UserService extends TokenService {
     const user = await this.usersDao.getUser(alias);
     return user ? user : null;
   }
-
-  //get follower and followee count
   //All pages
 }

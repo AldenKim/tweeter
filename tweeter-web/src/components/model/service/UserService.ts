@@ -112,7 +112,7 @@ export class UserService {
       user: userToUnfollow.dto
     };
 
-    return this.serverFacade.follow(request);
+    return this.serverFacade.unfollow(request);
   }
 
   public async getUser(
