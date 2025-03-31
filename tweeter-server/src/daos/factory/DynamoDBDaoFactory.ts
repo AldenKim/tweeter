@@ -7,6 +7,8 @@ import { SessionsDao } from "../SessionsDao";
 import { UsersDao } from "../UsersDao";
 import { FollowsDao } from "../FollowsDao";
 import { DynamoDBFollowsDao } from "../DynamoDBFollowsDao";
+import { StatusDao } from "../StatusDao";
+import { DyanmoDBStatusDao } from "../DynamoDBStatusDao";
 
 export class DynamoDBDaoFactory implements DaoFactory {
     createUsersDao(): UsersDao {
@@ -23,5 +25,9 @@ export class DynamoDBDaoFactory implements DaoFactory {
 
     createFollowsDao(): FollowsDao {
         return new DynamoDBFollowsDao();
+    }
+
+    createStatusDao(): StatusDao {
+        return new DyanmoDBStatusDao();
     }
 }

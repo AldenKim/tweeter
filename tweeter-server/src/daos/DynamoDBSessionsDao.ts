@@ -3,6 +3,7 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  ScanCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
@@ -25,7 +26,7 @@ export class DynamoDBSessionsDao implements SessionsDao {
       Item: {
         [this.authTokenAttr]: auth_token.token,
         [this.timeStampAttr]: auth_token.timestamp,
-        [this.handleAttr]: handle
+        [this.handleAttr]: handle,
       },
     };
 
@@ -59,7 +60,6 @@ export class DynamoDBSessionsDao implements SessionsDao {
     }
   }
 
-  
   public async getHandleBySession(token: string): Promise<string> {
     const params = {
       TableName: this.tableName,
@@ -70,9 +70,7 @@ export class DynamoDBSessionsDao implements SessionsDao {
 
     const output = await this.client.send(new GetCommand(params));
 
-    if (
-      output.Item == undefined || output.Item[this.handleAttr] == undefined
-    ) {
+    if (output.Item == undefined || output.Item[this.handleAttr] == undefined) {
       return "";
     } else {
       return output.Item[this.handleAttr];
@@ -100,7 +98,7 @@ export class DynamoDBSessionsDao implements SessionsDao {
         [this.authTokenAttr]: token,
       },
       ExpressionAttributeNames: {
-        "#ts": this.timeStampAttr, 
+        "#ts": this.timeStampAttr,
       },
       ExpressionAttributeValues: {
         ":newTime": currentTime,
@@ -123,5 +121,27 @@ export class DynamoDBSessionsDao implements SessionsDao {
     }
 
     await this.updateSession(auth_token.token, currentTime);
+  }
+
+  public async cleanExpiredSessions(): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+    };
+
+    const data = await this.client.send(new ScanCommand(params));
+
+    if (!data.Items) return;
+
+    for (const item of data.Items) {
+      try {
+        const authToken = new AuthToken(
+          item[this.authTokenAttr],
+          item[this.timeStampAttr]
+        ).dto;
+        await this.checkTimeStampAndUpdate(authToken);
+      } catch (error) {
+        console.log(`Session expired and removed: ${item[this.authTokenAttr]}`);
+      }
+    }
   }
 }

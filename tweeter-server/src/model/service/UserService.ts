@@ -60,6 +60,8 @@ export class UserService extends TokenService {
       throw new Error("[Bad Request] Invalid password");
     }
 
+    await this.sessionsDao.cleanExpiredSessions();
+
     const auth_token = await this.sessionsDao.createSession(alias);
 
     if (auth_token === null) {
@@ -97,6 +99,8 @@ export class UserService extends TokenService {
     if (user === null) {
       throw new Error("[Bad Request] Invalid registration");
     }
+
+    await this.sessionsDao.cleanExpiredSessions();
 
     const auth_token = await this.sessionsDao.createSession(alias);
 

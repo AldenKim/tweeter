@@ -6,9 +6,9 @@ import { SessionsDao } from "../../daos/SessionsDao";
 import { UsersDao } from "../../daos/UsersDao";
 
 export class FollowService extends TokenService {
-  private followsDao: FollowsDao;
-  private sessionsDao: SessionsDao;
-  private usersDao: UsersDao;
+  private readonly followsDao: FollowsDao;
+  private readonly sessionsDao: SessionsDao;
+  private readonly usersDao: UsersDao;
 
   public constructor(factory: DaoFactory) {
     super();
