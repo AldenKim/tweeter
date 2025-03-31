@@ -13,6 +13,7 @@ import { S3DaoInterface } from "../../daos/S3DaoInterface";
 import * as bcrypt from "bcryptjs";
 import { TokenService } from "./TokenService";
 import { FollowsDao } from "../../daos/FollowsDao";
+import { Follow } from "../../daos/entity/Follow";
 
 export class UserService extends TokenService {
   private readonly usersDao: UsersDao;
@@ -76,7 +77,6 @@ export class UserService extends TokenService {
     userImageBytes: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
     if ((await this.usersDao.getUser(alias)) !== null) {
       throw new Error("[Bad Request] user alias already taken");
     }
@@ -112,8 +112,15 @@ export class UserService extends TokenService {
     user: UserDto,
     selectedUser: UserDto
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    try {
+      const check = await this.followsDao.getFollow(
+        new Follow(user.alias, "", selectedUser.alias, "")
+      );
+
+      return check ? true : false;
+    } catch (error) {
+      throw new Error("[Server Error] unable to get follower status");
+    }
   }
 
   public async getFolloweeCount(token: string, user: UserDto): Promise<number> {
