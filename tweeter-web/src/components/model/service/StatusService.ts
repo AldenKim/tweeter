@@ -43,7 +43,7 @@ export class StatusService {
     // Pause so we can see the logging out message. Remove when connected to the server
     const request: PostStatusRequest = {
       token: authToken.token,
-      newStatus: newStatus
+      newStatus: newStatus.dto
     }
 
     // TODO: Call the server to post the status

@@ -42,7 +42,7 @@ export class DyanmoDBStatusDao implements StatusDao {
       },
       Limit: pageSize,
       ExclusiveStartKey:
-        lastItem === undefined
+        lastItem === null
           ? undefined
           : {
               [this.handleAttr]: userAlias,

@@ -56,6 +56,7 @@ export class StatusService extends TokenService {
     try {
       await this.statusDao.postStatus(newStatus);
     } catch (error) {
+      console.error("DynamoDB PutCommand Error:", error);
       throw new Error("[Server Error] unable to post status");
     }
   }
