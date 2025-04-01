@@ -175,47 +175,52 @@ export class DynamoDBFollowsDao {
 
     const data = await this.client.send(new QueryCommand(params));
 
-    return data.Items ? data.Items.length : 0; 
+    return data.Items ? data.Items.length : 0;
   }
 
   public async getFollowersCount(followeeHandle: string): Promise<number> {
     const params: any = {
-        TableName: this.tableName,
-        IndexName: this.indexName,  
-        KeyConditionExpression: `${this.followeeAttr} = :followeeHandle`, 
-        ExpressionAttributeValues: {
-          ":followeeHandle": followeeHandle,
-        },
-      };
+      TableName: this.tableName,
+      IndexName: this.indexName,
+      KeyConditionExpression: `${this.followeeAttr} = :followeeHandle`,
+      ExpressionAttributeValues: {
+        ":followeeHandle": followeeHandle,
+      },
+    };
 
     const data = await this.client.send(new QueryCommand(params));
 
-    return data.Items ? data.Items.length : 0; 
+    return data.Items ? data.Items.length : 0;
   }
 
-  public async getFollowees(userAlias: string): Promise<string[]> {
-    let followees: string[] = [];
+  public async getFollowers(userAlias: string): Promise<string[]> {
+    let followers: string[] = [];
     let LastEvaluatedKey = undefined;
 
-    do {
+    while (true) {
       const params: any = {
         TableName: this.tableName,
-        KeyConditionExpression: `${this.followerAttr} = :follower`,
+        IndexName: this.indexName,
+        KeyConditionExpression: `${this.followeeAttr} = :followee`,
         ExpressionAttributeValues: {
-          ":follower": userAlias,
+          ":followee": userAlias,
         },
-        ExclusiveStartKey: LastEvaluatedKey, 
+        ExclusiveStartKey: LastEvaluatedKey,
       };
 
       const data = await this.client.send(new QueryCommand(params));
 
       if (data.Items) {
-        followees.push(...data.Items.map((item) => item[this.followeeAttr]));
+        followers.push(...data.Items.map((item) => item[this.followerAttr]));
+      }
+      
+      if(data.LastEvaluatedKey === undefined) {
+        break;
       }
 
-      LastEvaluatedKey = data.LastEvaluatedKey;
-    } while (LastEvaluatedKey);
+      LastEvaluatedKey = data.LastEvaluatedKey
+    }
 
-    return followees;
+    return followers;
   }
 }

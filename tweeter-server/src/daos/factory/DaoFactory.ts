@@ -1,3 +1,4 @@
+import { FeedDao } from "../FeedDao";
 import { FollowsDao } from "../FollowsDao";
 import { S3DaoInterface } from "../S3DaoInterface";
 import { SessionsDao } from "../SessionsDao";
@@ -10,4 +11,5 @@ export interface DaoFactory {
     createS3Dao(): S3DaoInterface;
     createFollowsDao(): FollowsDao;
     createStatusDao(): StatusDao;
+    createFeedDao(): FeedDao;
 }

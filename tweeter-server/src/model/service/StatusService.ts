@@ -27,8 +27,6 @@ export class StatusService extends TokenService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     await this.validateToken(this.sessionsDao, token);
-    const followees = await this.followsDao.getFollowees(userAlias);
-
     
 
     return this.getFakeData(lastItem, pageSize);
@@ -59,9 +57,13 @@ export class StatusService extends TokenService {
 
   public async postStatus(token: string, newStatus: StatusDto): Promise<void> {
     await this.validateToken(this.sessionsDao, token);
+    const user = await this.sessionsDao.getHandleBySession(token);
 
     try {
       await this.statusDao.postStatus(newStatus);
+      const followers = await this.followsDao.getFollowers(user);
+      
+      
     } catch (error) {
       console.error("DynamoDB PutCommand Error:", error);
       throw new Error("[Server Error] unable to post status");
