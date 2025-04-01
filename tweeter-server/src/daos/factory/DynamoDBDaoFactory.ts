@@ -18,11 +18,11 @@ export class DynamoDBDaoFactory implements DaoFactory {
     private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
     createUsersDao(): UsersDao {
-        return new DynamoDBUsersDao();
+        return new DynamoDBUsersDao(this.client);
     }
 
     createSessionsDao(): SessionsDao {
-        return new DynamoDBSessionsDao();
+        return new DynamoDBSessionsDao(this.client);
     }
 
     createS3Dao(): S3DaoInterface {
@@ -30,11 +30,11 @@ export class DynamoDBDaoFactory implements DaoFactory {
     }
 
     createFollowsDao(): FollowsDao {
-        return new DynamoDBFollowsDao();
+        return new DynamoDBFollowsDao(this.client);
     }
 
     createStatusDao(): StatusDao {
-        return new DyanmoDBStatusDao();
+        return new DyanmoDBStatusDao(this.client);
     }
 
     createFeedDao(): FeedDao {

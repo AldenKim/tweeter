@@ -17,8 +17,11 @@ export class DynamoDBFollowsDao {
   readonly followeeAttr = "followee_handle";
   readonly followerNameAttr = "follower_name";
   readonly followeeNameAttr = "followee_name";
+  readonly client;
 
-  private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+  public constructor(client: DynamoDBDocumentClient) {
+    this.client = client;
+  }
 
   public async putFollow(follow: Follow): Promise<void> {
     const params = {

@@ -15,7 +15,11 @@ export class DyanmoDBStatusDao implements StatusDao {
   readonly timestampAttr = "timestamp";
   readonly postAttr = "post";
 
-  private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+  private readonly client;
+
+  public constructor(client: DynamoDBDocumentClient) {
+    this.client = client;
+  }
 
   public async postStatus(newStatus: StatusDto): Promise<void> {
     const params = {
