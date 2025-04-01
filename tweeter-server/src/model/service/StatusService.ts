@@ -4,17 +4,20 @@ import { SessionsDao } from "../../daos/SessionsDao";
 import { DaoFactory } from "../../daos/factory/DaoFactory";
 import { StatusDao } from "../../daos/StatusDao";
 import { UsersDao } from "../../daos/UsersDao";
+import { FollowsDao } from "../../daos/FollowsDao";
 
 export class StatusService extends TokenService {
   private readonly sessionsDao: SessionsDao;
   private readonly statusDao: StatusDao;
   private readonly usersDao: UsersDao;
+  private readonly followsDao: FollowsDao;
 
   public constructor(factory: DaoFactory) {
     super();
     this.sessionsDao = factory.createSessionsDao();
     this.statusDao = factory.createStatusDao();
     this.usersDao = factory.createUsersDao();
+    this.followsDao = factory.createFollowsDao();
   }
 
   public async loadMoreFeedItems(
@@ -23,7 +26,11 @@ export class StatusService extends TokenService {
     pageSize: number,
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
-    // TODO: Replace with the result of calling server
+    await this.validateToken(this.sessionsDao, token);
+    const followees = await this.followsDao.getFollowees(userAlias);
+
+    
+
     return this.getFakeData(lastItem, pageSize);
   }
 

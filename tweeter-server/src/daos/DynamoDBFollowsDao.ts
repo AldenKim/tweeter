@@ -192,4 +192,30 @@ export class DynamoDBFollowsDao {
 
     return data.Items ? data.Items.length : 0; 
   }
+
+  public async getFollowees(userAlias: string): Promise<string[]> {
+    let followees: string[] = [];
+    let LastEvaluatedKey = undefined;
+
+    do {
+      const params: any = {
+        TableName: this.tableName,
+        KeyConditionExpression: `${this.followerAttr} = :follower`,
+        ExpressionAttributeValues: {
+          ":follower": userAlias,
+        },
+        ExclusiveStartKey: LastEvaluatedKey, 
+      };
+
+      const data = await this.client.send(new QueryCommand(params));
+
+      if (data.Items) {
+        followees.push(...data.Items.map((item) => item[this.followeeAttr]));
+      }
+
+      LastEvaluatedKey = data.LastEvaluatedKey;
+    } while (LastEvaluatedKey);
+
+    return followees;
+  }
 }
