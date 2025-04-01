@@ -11,8 +11,12 @@ import { StatusDao } from "../StatusDao";
 import { DyanmoDBStatusDao } from "../DynamoDBStatusDao";
 import { FeedDao } from "../FeedDao";
 import { DynamoDBFeedDao } from "../DyanmoDBFeedDao";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
 export class DynamoDBDaoFactory implements DaoFactory {
+    private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
+
     createUsersDao(): UsersDao {
         return new DynamoDBUsersDao();
     }
@@ -34,6 +38,6 @@ export class DynamoDBDaoFactory implements DaoFactory {
     }
 
     createFeedDao(): FeedDao {
-        return new DynamoDBFeedDao();
+        return new DynamoDBFeedDao(this.client);
     }
 }

@@ -5,12 +5,14 @@ import { DaoFactory } from "../../daos/factory/DaoFactory";
 import { StatusDao } from "../../daos/StatusDao";
 import { UsersDao } from "../../daos/UsersDao";
 import { FollowsDao } from "../../daos/FollowsDao";
+import { FeedDao } from "../../daos/FeedDao";
 
 export class StatusService extends TokenService {
   private readonly sessionsDao: SessionsDao;
   private readonly statusDao: StatusDao;
   private readonly usersDao: UsersDao;
   private readonly followsDao: FollowsDao;
+  private readonly feedDao: FeedDao;
 
   public constructor(factory: DaoFactory) {
     super();
@@ -18,6 +20,7 @@ export class StatusService extends TokenService {
     this.statusDao = factory.createStatusDao();
     this.usersDao = factory.createUsersDao();
     this.followsDao = factory.createFollowsDao();
+    this.feedDao = factory.createFeedDao();
   }
 
   public async loadMoreFeedItems(
@@ -28,8 +31,19 @@ export class StatusService extends TokenService {
   ): Promise<[StatusDto[], boolean]> {
     await this.validateToken(this.sessionsDao, token);
     
+    const page = await this.feedDao.getFeedPage(userAlias, pageSize, lastItem);
+    
+    let statusDtoList: StatusDto[] = [];
 
-    return this.getFakeData(lastItem, pageSize);
+    for (const item of page.values) {
+      const user = await this.usersDao.getUser(item.handle);
+      const converter = User.fromDto(user);
+      if (converter) {
+        statusDtoList.push(new Status(item.post, converter, item.timestamp).dto);
+      }
+    }
+
+    return [statusDtoList, page.hasMorePages];
   }
 
   public async loadMoreStoryItems(
@@ -62,8 +76,7 @@ export class StatusService extends TokenService {
     try {
       await this.statusDao.postStatus(newStatus);
       const followers = await this.followsDao.getFollowers(user);
-      
-      
+      await this.feedDao.addFeedItems(followers, newStatus);
     } catch (error) {
       console.error("DynamoDB PutCommand Error:", error);
       throw new Error("[Server Error] unable to post status");

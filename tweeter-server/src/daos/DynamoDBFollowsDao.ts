@@ -205,6 +205,7 @@ export class DynamoDBFollowsDao {
         ExpressionAttributeValues: {
           ":followee": userAlias,
         },
+        Limit: 25,
         ExclusiveStartKey: LastEvaluatedKey,
       };
 
