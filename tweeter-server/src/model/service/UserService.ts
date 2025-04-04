@@ -131,7 +131,7 @@ export class UserService extends TokenService {
     try {
       await this.validateToken(this.sessionsDao, token);
 
-      return await this.followsDao.getFolloweesCount(user.alias);
+      return await this.usersDao.getFolloweesCount(user.alias);
     } catch (error) {
       throw new Error("[Server Error] unable to get followee count");
     }
@@ -141,7 +141,7 @@ export class UserService extends TokenService {
     try {
       await this.validateToken(this.sessionsDao, token);
 
-      return await this.followsDao.getFollowersCount(user.alias);
+      return await this.usersDao.getFollowersCount(user.alias);
     } catch (error) {
       throw new Error("[Server Error] unable to get follower count");
     }
@@ -158,6 +158,9 @@ export class UserService extends TokenService {
       await this.followsDao.putFollow(
         new Follow(userAlias, "", userToFollow.alias, "")
       );
+
+      await this.usersDao.incrementFolloweesCount(userAlias);
+      await this.usersDao.incrementFollowersCount(userToFollow.alias);
 
       const followerCount = await this.getFollowerCount(token, userToFollow);
       const followeeCount = await this.getFolloweeCount(token, userToFollow);
@@ -179,6 +182,9 @@ export class UserService extends TokenService {
       await this.followsDao.deleteFollow(
         new Follow(userAlias, "", userToUnfollow.alias, "")
       );
+
+      await this.usersDao.decrementFolloweesCount(userAlias);
+      await this.usersDao.decrementFollowersCount(userToUnfollow.alias);
 
       const followerCount = await this.getFollowerCount(token, userToUnfollow);
       const followeeCount = await this.getFolloweeCount(token, userToUnfollow);

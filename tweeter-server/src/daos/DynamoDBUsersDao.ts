@@ -1,4 +1,9 @@
-import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { UsersDao } from "./UsersDao";
 import { User, UserDto } from "tweeter-shared";
@@ -10,6 +15,8 @@ export class DynamoDBUsersDao implements UsersDao {
   private readonly lastNameAttr = "lastName";
   private readonly imageUrlAttr = "imageUrl";
   private readonly passwordAttr = "password";
+  private readonly followerCountAttr = "followerCount";
+  private readonly followeeCountAttr = "followeeCount";
 
   private readonly client;
 
@@ -45,7 +52,10 @@ export class DynamoDBUsersDao implements UsersDao {
     }
   }
 
-  public async addUser(newUser: User, password: string): Promise<UserDto | null> {
+  public async addUser(
+    newUser: User,
+    password: string
+  ): Promise<UserDto | null> {
     const params = {
       TableName: this.tableName,
       Item: {
@@ -53,7 +63,9 @@ export class DynamoDBUsersDao implements UsersDao {
         [this.firstNameAttr]: newUser.firstName,
         [this.lastNameAttr]: newUser.lastName,
         [this.imageUrlAttr]: newUser.imageUrl,
-        [this.passwordAttr]: password
+        [this.passwordAttr]: password,
+        [this.followerCountAttr]: 0,
+        [this.followeeCountAttr]: 0,
       },
     };
 
@@ -81,5 +93,95 @@ export class DynamoDBUsersDao implements UsersDao {
     } else {
       return output.Item[this.passwordAttr];
     }
+  }
+
+  public async getFolloweesCount(handle: string): Promise<number> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.handleAttr]: handle,
+      },
+      ProjectionExpressions: this.followeeCountAttr,
+    };
+
+    const output = await this.client.send(new GetCommand(params));
+
+    if (
+      output.Item == undefined ||
+      output.Item[this.followeeCountAttr] == undefined
+    ) {
+      return 0;
+    } else {
+      return output.Item[this.followeeCountAttr];
+    }
+  }
+
+  public async getFollowersCount(handle: string): Promise<number> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        [this.handleAttr]: handle,
+      },
+      ProjectionExpressions: this.followerCountAttr,
+    };
+
+    const output = await this.client.send(new GetCommand(params));
+
+    if (
+      output.Item == undefined ||
+      output.Item[this.followerCountAttr] == undefined
+    ) {
+      return 0;
+    } else {
+      return output.Item[this.followerCountAttr];
+    }
+  }
+
+  public async incrementFolloweesCount(handle: string): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+      Key: { [this.handleAttr]: handle },
+      ExpressionAttributeValues: { ":inc": 1 },
+      UpdateExpression:
+        "SET " + this.followeeCountAttr + " = " + this.followeeCountAttr + " + :inc",
+    };
+
+    await this.client.send(new UpdateCommand(params));
+  }
+
+  public async incrementFollowersCount(handle: string): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+      Key: { [this.handleAttr]: handle },
+      ExpressionAttributeValues: { ":inc": 1 },
+      UpdateExpression:
+        "SET " + this.followerCountAttr + " = " + this.followerCountAttr + " + :inc",
+    };
+
+    await this.client.send(new UpdateCommand(params));
+  }
+
+  public async decrementFolloweesCount(handle: string): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+      Key: { [this.handleAttr]: handle },
+      ExpressionAttributeValues: { ":inc": 1 },
+      UpdateExpression:
+        "SET " + this.followeeCountAttr + " = " + this.followeeCountAttr + " - :inc",
+    };
+
+    await this.client.send(new UpdateCommand(params));
+  }
+
+  public async decrementFollowersCount(handle: string): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+      Key: { [this.handleAttr]: handle },
+      ExpressionAttributeValues: { ":inc": 1 },
+      UpdateExpression:
+        "SET " + this.followerCountAttr + " = " + this.followerCountAttr + " - :inc",
+    };
+
+    await this.client.send(new UpdateCommand(params));
   }
 }

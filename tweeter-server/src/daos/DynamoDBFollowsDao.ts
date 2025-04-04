@@ -167,35 +167,6 @@ export class DynamoDBFollowsDao {
     return new DataPage<Follow>(items, hasMorePages);
   }
 
-  public async getFolloweesCount(followerHandle: string): Promise<number> {
-    const params: any = {
-      TableName: this.tableName,
-      KeyConditionExpression: `${this.followerAttr} = :followerHandle`,
-      ExpressionAttributeValues: {
-        ":followerHandle": followerHandle,
-      },
-    };
-
-    const data = await this.client.send(new QueryCommand(params));
-
-    return data.Items ? data.Items.length : 0;
-  }
-
-  public async getFollowersCount(followeeHandle: string): Promise<number> {
-    const params: any = {
-      TableName: this.tableName,
-      IndexName: this.indexName,
-      KeyConditionExpression: `${this.followeeAttr} = :followeeHandle`,
-      ExpressionAttributeValues: {
-        ":followeeHandle": followeeHandle,
-      },
-    };
-
-    const data = await this.client.send(new QueryCommand(params));
-
-    return data.Items ? data.Items.length : 0;
-  }
-
   public async getFollowers(userAlias: string): Promise<string[]> {
     let followers: string[] = [];
     let LastEvaluatedKey = undefined;
