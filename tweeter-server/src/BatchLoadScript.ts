@@ -1,5 +1,5 @@
 import { FillUserTableDao } from "./daos/FillUserTableDao";
-import { FillFollowTableDao } from "./FillFollowTableDao";
+import { FillFollowTableDao } from "./daos/FillFollowTableDao";
 
 import { User } from "tweeter-shared";
 
