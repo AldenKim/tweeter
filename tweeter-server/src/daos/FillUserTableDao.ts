@@ -14,13 +14,13 @@ export class FillUserTableDao {
   // Modify these values as needed to match your user table.
   //
   private readonly tableName = "users";
-  private readonly userAliasAttribute = "alias";
-  private readonly userFirstNameAttribute = "first_name";
-  private readonly userLastNameAttribute = "last_name";
-  private readonly userImageUrlAttribute = "image_url";
-  private readonly passwordHashAttribute = "password_hash";
-  private readonly followeeCountAttribute = "followee_count";
-  private readonly followerCountAttribute = "follower_count";
+  private readonly userAliasAttribute = "handle";
+  private readonly userFirstNameAttribute = "firstName";
+  private readonly userLastNameAttribute = "lastName";
+  private readonly userImageUrlAttribute = "imageUrl";
+  private readonly passwordHashAttribute = "password";
+  private readonly followeeCountAttribute = "followeeCount";
+  private readonly followerCountAttribute = "followerCount";
 
   private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
