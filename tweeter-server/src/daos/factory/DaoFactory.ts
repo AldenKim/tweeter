@@ -1,3 +1,4 @@
+import { SqsClient } from "../../sqs/SqsClient";
 import { FeedDao } from "../FeedDao";
 import { FollowsDao } from "../FollowsDao";
 import { S3DaoInterface } from "../S3DaoInterface";

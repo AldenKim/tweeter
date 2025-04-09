@@ -6,6 +6,7 @@ import { StatusDao } from "../../daos/StatusDao";
 import { UsersDao } from "../../daos/UsersDao";
 import { FollowsDao } from "../../daos/FollowsDao";
 import { FeedDao } from "../../daos/FeedDao";
+import { SqsClient } from "../../sqs/SqsClient";
 
 export class StatusService extends TokenService {
   private readonly sessionsDao: SessionsDao;
@@ -73,8 +74,13 @@ export class StatusService extends TokenService {
     await this.validateToken(this.sessionsDao, token);
     const user = await this.sessionsDao.getHandleBySession(token);
 
+    //const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/PostStatusQueue");
+
     try {
       await this.statusDao.postStatus(newStatus);
+
+      //await sqsClient.sendMessage(JSON.stringify(newStatus))
+
       const followers = await this.followsDao.getFollowers(user);
       await this.feedDao.addFeedItems(followers, newStatus);
     } catch (error) {
