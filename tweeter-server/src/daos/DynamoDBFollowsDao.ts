@@ -188,14 +188,49 @@ export class DynamoDBFollowsDao {
       if (data.Items) {
         followers.push(...data.Items.map((item) => item[this.followerAttr]));
       }
-      
-      if(data.LastEvaluatedKey === undefined) {
+
+      if (data.LastEvaluatedKey === undefined) {
         break;
       }
 
-      LastEvaluatedKey = data.LastEvaluatedKey
+      LastEvaluatedKey = data.LastEvaluatedKey;
     }
 
     return followers;
+  }
+
+  public async getFollowersSQS(
+    userAlias: string,
+    amount: number,
+    lastFollowerHandle: string | undefined
+  ): Promise<[string[], boolean]> {
+    let followers: string[] = [];
+
+    const params: any = {
+      TableName: this.tableName,
+      IndexName: this.indexName,
+      KeyConditionExpression: `${this.followeeAttr} = :followee`,
+      ExpressionAttributeValues: {
+        ":followee": userAlias,
+      },
+      Limit: amount,
+      ExclusiveStartKey:
+        lastFollowerHandle === undefined
+          ? undefined
+          : {
+              [this.followeeAttr]: userAlias,
+              [this.followerAttr]: lastFollowerHandle,
+            },
+    };
+
+    const data = await this.client.send(new QueryCommand(params));
+
+    if (data.Items) {
+      followers.push(...data.Items.map((item) => item[this.followerAttr]));
+    }
+
+    const hasMorePages = data.LastEvaluatedKey !== undefined;
+
+    return [followers, hasMorePages];
   }
 }

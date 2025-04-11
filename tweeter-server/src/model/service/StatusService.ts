@@ -74,30 +74,45 @@ export class StatusService extends TokenService {
     await this.validateToken(this.sessionsDao, token);
     const user = await this.sessionsDao.getHandleBySession(token);
 
-    //const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/PostStatusQueue");
+    const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/PostStatusQueue");
 
     try {
       await this.statusDao.postStatus(newStatus);
 
-      //await sqsClient.sendMessage(JSON.stringify(newStatus))
+      await sqsClient.sendMessage(JSON.stringify(newStatus))
 
-      const followers = await this.followsDao.getFollowers(user);
-      await this.feedDao.addFeedItems(followers, newStatus);
+      /*const followers = await this.followsDao.getFollowers(user);
+      await this.feedDao.addFeedItems(followers, newStatus);*/
     } catch (error) {
       console.error("DynamoDB PutCommand Error:", error);
       throw new Error("[Server Error] unable to post status");
     }
   }
 
-  private async getFakeData(
-    lastItem: StatusDto | null,
-    pageSize: number
-  ): Promise<[StatusDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfStatuses(
-      Status.fromDto(lastItem),
-      pageSize
-    );
-    const dtos = items.map((status) => status.dto);
-    return [dtos, hasMore];
+  public async postToFeedQueue(status: StatusDto) {
+    const alias = status.user.alias;
+
+    let lastFollowerHandle = undefined;
+    let followers: string[] = [];
+    let hasMore: boolean = true;
+
+    const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/UpdateFeedQueue");
+    
+    while(hasMore) {
+        [followers, hasMore] = await this.followsDao.getFollowersSQS(alias, 100, lastFollowerHandle);
+        
+        lastFollowerHandle = followers[followers.length - 1];
+
+        const postToFeedItem = {
+          status,
+          followers
+        }
+
+        await sqsClient.sendMessage(JSON.stringify(postToFeedItem));
+    }
+  }
+
+  public async addToFeed(newStatus: StatusDto, followers: string[]) {
+    await this.feedDao.addFeedItems(followers, newStatus);
   }
 }

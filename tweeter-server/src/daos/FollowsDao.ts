@@ -20,5 +20,6 @@ export interface FollowsDao {
     pageSize: number,
     lastFollowerHandle: string | undefined
   ): Promise<DataPage<Follow>>;
-  getFollowers(userAlias: string): Promise<string[]>
+  getFollowers(userAlias: string): Promise<string[]>;
+  getFollowersSQS(userAlias: string, amount: number, lastFollowerHandle: string | undefined): Promise<[string[], boolean]>;
 }
