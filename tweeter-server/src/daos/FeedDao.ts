@@ -9,4 +9,5 @@ export interface FeedDao {
     pageSize: number,
     lastItem: StatusDto | null
   ): Promise<DataPage<StatusHelper>>;
+  batchWriteFeedItems(followers: string[], newStatus: StatusDto): Promise<void>;
 }

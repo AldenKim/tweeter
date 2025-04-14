@@ -1,4 +1,9 @@
-import { DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  BatchWriteCommand,
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { StatusDto } from "tweeter-shared";
 import { FeedDao } from "./FeedDao";
@@ -33,6 +38,60 @@ export class DynamoDBFeedDao implements FeedDao {
       };
       await this.client.send(new PutCommand(params));
     }
+  }
+
+  public async batchWriteFeedItems(
+    followers: string[],
+    newStatus: StatusDto
+  ): Promise<void> {
+    if (followers.length > 25) {
+      throw new Error("batchWriteFeedItems received more than 25 items");
+    }
+
+    const params = {
+      RequestItems: {
+        [this.tableName]: this.createPutFeedRequestItems(followers, newStatus),
+      },
+    };
+
+    try {
+      await this.client.send(new BatchWriteCommand(params));
+    } catch (err) {
+      throw new Error(
+        `Error while batch writing follows with params: ${JSON.stringify(params)} \n${err}`
+      );
+    }
+  }
+
+  private createPutFeedRequestItems(followers: string[], newStatus: StatusDto) {
+    return followers.map((handle) =>
+      this.createPutFeedRequest(
+        handle,
+        newStatus.timestamp,
+        newStatus.user.alias,
+        newStatus.post
+      )
+    );
+  }
+
+  private createPutFeedRequest(
+    handle: string,
+    timestamp: number,
+    posthandle: string,
+    post: string
+  ) {
+    const item = {
+      [this.handleAttr]: handle,
+      [this.timestampAttr]: timestamp,
+      [this.postHandleAttr]: posthandle,
+      [this.postAttr]: post,
+    };
+
+    return {
+      PutRequest: {
+        Item: item,
+      },
+    };
   }
 
   public async getFeedPage(

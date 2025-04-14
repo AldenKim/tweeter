@@ -31,16 +31,18 @@ export class StatusService extends TokenService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     await this.validateToken(this.sessionsDao, token);
-    
+
     const page = await this.feedDao.getFeedPage(userAlias, pageSize, lastItem);
-    
+
     let statusDtoList: StatusDto[] = [];
 
     for (const item of page.values) {
       const user = await this.usersDao.getUser(item.handle);
       const converter = User.fromDto(user);
       if (converter) {
-        statusDtoList.push(new Status(item.post, converter, item.timestamp).dto);
+        statusDtoList.push(
+          new Status(item.post, converter, item.timestamp).dto
+        );
       }
     }
 
@@ -55,7 +57,11 @@ export class StatusService extends TokenService {
   ): Promise<[StatusDto[], boolean]> {
     await this.validateToken(this.sessionsDao, token);
 
-    const page = await this.statusDao.getStoryPage(userAlias, pageSize, lastItem);
+    const page = await this.statusDao.getStoryPage(
+      userAlias,
+      pageSize,
+      lastItem
+    );
     const user = await this.usersDao.getUser(userAlias);
 
     let statusDtoList: StatusDto[] = [];
@@ -63,7 +69,9 @@ export class StatusService extends TokenService {
     for (const item of page.values) {
       const converter = User.fromDto(user);
       if (converter) {
-        statusDtoList.push(new Status(item.post, converter, item.timestamp).dto);
+        statusDtoList.push(
+          new Status(item.post, converter, item.timestamp).dto
+        );
       }
     }
 
@@ -74,12 +82,14 @@ export class StatusService extends TokenService {
     await this.validateToken(this.sessionsDao, token);
     const user = await this.sessionsDao.getHandleBySession(token);
 
-    const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/PostStatusQueue");
+    const sqsClient = new SqsClient(
+      "https://sqs.us-west-2.amazonaws.com/905418091492/PostStatusQueue"
+    );
 
     try {
       await this.statusDao.postStatus(newStatus);
 
-      await sqsClient.sendMessage(JSON.stringify(newStatus))
+      await sqsClient.sendMessage(JSON.stringify(newStatus));
 
       /*const followers = await this.followsDao.getFollowers(user);
       await this.feedDao.addFeedItems(followers, newStatus);*/
@@ -96,23 +106,35 @@ export class StatusService extends TokenService {
     let followers: string[] = [];
     let hasMore: boolean = true;
 
-    const sqsClient = new SqsClient("https://sqs.us-west-2.amazonaws.com/905418091492/UpdateFeedQueue");
-    
-    while(hasMore) {
-        [followers, hasMore] = await this.followsDao.getFollowersSQS(alias, 100, lastFollowerHandle);
-        
-        lastFollowerHandle = followers[followers.length - 1];
+    const sqsClient = new SqsClient(
+      "https://sqs.us-west-2.amazonaws.com/905418091492/UpdateFeedQueue"
+    );
 
-        const postToFeedItem = {
-          status,
-          followers
-        }
+    while (hasMore) {
+      [followers, hasMore] = await this.followsDao.getFollowersSQS(
+        alias,
+        100,
+        lastFollowerHandle
+      );
 
-        await sqsClient.sendMessage(JSON.stringify(postToFeedItem));
+      lastFollowerHandle = followers[followers.length - 1];
+
+      console.log("Fetched followers:", followers);
+
+      const postToFeedItem = {
+        status,
+        followers,
+      };
+
+      await sqsClient.sendMessage(JSON.stringify(postToFeedItem));
     }
   }
 
   public async addToFeed(newStatus: StatusDto, followers: string[]) {
-    await this.feedDao.addFeedItems(followers, newStatus);
+    const maxNumberOfFollowers = 25;
+    for (let i = 0; i < followers.length; i += maxNumberOfFollowers) {
+      const sliceOfFollowers = followers.slice(i, i + maxNumberOfFollowers);
+      await this.feedDao.batchWriteFeedItems(sliceOfFollowers, newStatus);
+    }
   }
 }
